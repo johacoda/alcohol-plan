@@ -7,100 +7,100 @@
 <title>My Alcohol Plan</title>
 <style>
 :root{
-  --bg:#FAFAFA;--surface:#F2F2F0;--card:#FFFFFF;--ink:#0D0D0B;--muted:#55534D;--line:#DEDDD8;
-  --p1:#3C3158;--p2:#73629F;--p3:#AFA4CF;--ptint:#ECE8F4;--on-p1:#FAFAFA;
-  --red:#C0392B;--red-ink:#A93226;--red-tint:#FBEDEB;--on-red:#FFFFFF;
+  --t-bg:#FAFAFA;--t-surface:#F2F2F0;--t-card:#FFFFFF;--t-ink:#0D0D0B;--t-muted:#55534D;--t-line:#DEDDD8;
+  --t-p1:#3C3158;--t-p2:#73629F;--t-p3:#AFA4CF;--t-ptint:#ECE8F4;--t-on-p1:#FAFAFA;
+  --t-red:#C0392B;--t-red-ink:#A93226;--t-red-tint:#FBEDEB;--t-on-red:#FFFFFF;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#121210;--surface:#1C1B18;--card:#232220;--ink:#F2F2F0;--muted:#B5B3AC;--line:#3A3935;
-    --p1:#DCD3F2;--p2:#A897D4;--p3:#6F5F9E;--ptint:#2C2740;--on-p1:#0D0D0B;
-    --red:#E5695C;--red-ink:#F2978D;--red-tint:#2E1B19;--on-red:#0D0D0B;
+    --t-bg:#121210;--t-surface:#1C1B18;--t-card:#232220;--t-ink:#F2F2F0;--t-muted:#B5B3AC;--t-line:#3A3935;
+    --t-p1:#DCD3F2;--t-p2:#A897D4;--t-p3:#6F5F9E;--t-ptint:#2C2740;--t-on-p1:#0D0D0B;
+    --t-red:#E5695C;--t-red-ink:#F2978D;--t-red-tint:#2E1B19;--t-on-red:#0D0D0B;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#121210;--surface:#1C1B18;--card:#232220;--ink:#F2F2F0;--muted:#B5B3AC;--line:#3A3935;
-  --p1:#DCD3F2;--p2:#A897D4;--p3:#6F5F9E;--ptint:#2C2740;--on-p1:#0D0D0B;
-  --red:#E5695C;--red-ink:#F2978D;--red-tint:#2E1B19;--on-red:#0D0D0B;
+  --t-bg:#121210;--t-surface:#1C1B18;--t-card:#232220;--t-ink:#F2F2F0;--t-muted:#B5B3AC;--t-line:#3A3935;
+  --t-p1:#DCD3F2;--t-p2:#A897D4;--t-p3:#6F5F9E;--t-ptint:#2C2740;--t-on-p1:#0D0D0B;
+  --t-red:#E5695C;--t-red-ink:#F2978D;--t-red-tint:#2E1B19;--t-on-red:#0D0D0B;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.5}
+body{margin:0;background:var(--t-bg);color:var(--t-ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.5}
 .wrap{max-width:560px;margin:0 auto;padding:16px 16px 112px}
 h1{font-size:1.35rem;margin:4px 0 12px;line-height:1.25}
 h2{font-size:1.15rem;margin:0 0 8px;line-height:1.3}
 h3{font-size:1rem;margin:14px 0 6px}
 p{margin:0 0 10px}
-.muted{color:var(--muted);font-size:.92rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
-.soft{background:var(--surface);border:none}
-.big{font-size:2.6rem;font-weight:800;line-height:1;color:var(--p1)}
-.big small{font-size:1rem;font-weight:600;color:var(--muted)}
-.allow{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--p1);margin:2px 0 4px}
-.bar{height:12px;background:var(--surface);border-radius:6px;overflow:hidden;margin:8px 0 6px}
-.bar>i{display:block;height:100%;background:var(--p1);border-radius:6px}
+.muted{color:var(--t-muted);font-size:.92rem}
+.card{background:var(--t-card);border:1px solid var(--t-line);border-radius:14px;padding:16px;margin:0 0 14px}
+.soft{background:var(--t-surface);border:none}
+.big{font-size:2.6rem;font-weight:800;line-height:1;color:var(--t-p1)}
+.big small{font-size:1rem;font-weight:600;color:var(--t-muted)}
+.allow{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--t-p1);margin:2px 0 4px}
+.bar{height:12px;background:var(--t-surface);border-radius:6px;overflow:hidden;margin:8px 0 6px}
+.bar>i{display:block;height:100%;background:var(--t-p1);border-radius:6px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .spread{justify-content:space-between}
 .ic{width:1.3em;height:1.3em;fill:currentColor;flex:none;vertical-align:-.28em}
-button,.btn{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--p1);background:var(--p1);color:var(--on-p1);padding:11px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
-button.ghost,.btn.ghost{background:transparent;color:var(--p1)}
+button,.btn{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--t-p1);background:var(--t-p1);color:var(--t-on-p1);padding:11px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+button.ghost,.btn.ghost{background:transparent;color:var(--t-p1)}
 button.small{padding:6px 10px;font-size:.9rem}
 button:disabled{opacity:.45;cursor:not-allowed}
 .btn.wide,button.wide{width:100%}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.drink{background:var(--surface);color:var(--ink);border:2px solid transparent;text-align:left;padding:10px;font-weight:600;line-height:1.3;display:block}
-.drink b{display:block;color:var(--p1);margin-top:4px}
-.drink span{display:block;font-weight:400;font-size:.85rem;color:var(--muted)}
-.drink:active{border-color:var(--p1)}
-.mine{background:var(--surface);border-radius:12px;padding:12px;margin:0 0 10px}
+.drink{background:var(--t-surface);color:var(--t-ink);border:2px solid transparent;text-align:left;padding:10px;font-weight:600;line-height:1.3;display:block}
+.drink b{display:block;color:var(--t-p1);margin-top:4px}
+.drink span{display:block;font-weight:400;font-size:.85rem;color:var(--t-muted)}
+.drink:active{border-color:var(--t-p1)}
+.mine{background:var(--t-surface);border-radius:12px;padding:12px;margin:0 0 10px}
 .mine .head{display:flex;gap:10px;align-items:flex-start}
-.mine .head .ic{color:var(--p1);width:1.6em;height:1.6em}
+.mine .head .ic{color:var(--t-p1);width:1.6em;height:1.6em}
 .mine .acts{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:10px}
 .mine .acts button{padding:10px 8px}
-.seg{display:flex;background:var(--surface);border-radius:10px;padding:3px;gap:3px}
-.seg button{flex:1;background:transparent;border:none;color:var(--ink);padding:8px;font-weight:600}
-.seg button[aria-pressed="true"]{background:var(--card);color:var(--p1);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.seg{display:flex;background:var(--t-surface);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;background:transparent;border:none;color:var(--t-ink);padding:8px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--t-card);color:var(--t-p1);box-shadow:0 1px 2px rgba(0,0,0,.15)}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
-.pills button{background:var(--surface);color:var(--ink);border:2px solid transparent;font-weight:600;padding:8px 12px}
-.pills button[aria-pressed="true"]{border-color:var(--p1);color:var(--p1);background:var(--ptint)}
+.pills button{background:var(--t-surface);color:var(--t-ink);border:2px solid transparent;font-weight:600;padding:8px 12px}
+.pills button[aria-pressed="true"]{border-color:var(--t-p1);color:var(--t-p1);background:var(--t-ptint)}
 .lbl{font-weight:600;margin:12px 0 6px}
-label.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+label.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--t-line)}
 label.chk:last-child{border-bottom:none}
-label.chk input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--p1)}
-input[type=number],input[type=text],input[type=tel],input[type=date],textarea{font:inherit;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+label.chk input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--t-p1)}
+input[type=number],input[type=text],input[type=tel],input[type=date],textarea{font:inherit;width:100%;padding:10px;border:1px solid var(--t-line);border-radius:10px;background:var(--t-card);color:var(--t-ink)}
 .field{display:block;margin:0 0 14px}
 .field>span{display:block;font-weight:600;margin-bottom:4px}
 .field>small{display:block;margin-top:4px}
 ul.log{list-style:none;padding:0;margin:0}
-ul.log li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+ul.log li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--t-line)}
 ul.log li:last-child{border-bottom:none}
 table{width:100%;border-collapse:collapse;font-size:.95rem}
-th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:.82rem;color:var(--muted);font-weight:600}
-tr.now td{background:var(--ptint);font-weight:700}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--t-line);vertical-align:top}
+th{font-size:.82rem;color:var(--t-muted);font-weight:600}
+tr.now td{background:var(--t-ptint);font-weight:700}
 .dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:280px;margin:8px 0}
-.dot{aspect-ratio:1;border-radius:50%;border:2px solid var(--p3);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted)}
-.dot.done{background:var(--p1);border-color:var(--p1);color:var(--on-p1)}
-.dot.today{border-color:var(--p1);border-width:3px;color:var(--p1);font-weight:800}
-.note{padding:10px 12px;background:var(--ptint);border-radius:10px;margin:0 0 12px}
-.warn{border:2px solid var(--red);background:var(--red-tint);border-radius:14px;padding:16px;margin:18px 0 14px}
-.warn h2{color:var(--red-ink);display:flex;gap:6px;align-items:center}
+.dot{aspect-ratio:1;border-radius:50%;border:2px solid var(--t-p3);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--t-muted)}
+.dot.done{background:var(--t-p1);border-color:var(--t-p1);color:var(--t-on-p1)}
+.dot.today{border-color:var(--t-p1);border-width:3px;color:var(--t-p1);font-weight:800}
+.note{padding:10px 12px;background:var(--t-ptint);border-radius:10px;margin:0 0 12px}
+.warn{border:2px solid var(--t-red);background:var(--t-red-tint);border-radius:14px;padding:16px;margin:18px 0 14px}
+.warn h2{color:var(--t-red-ink);display:flex;gap:6px;align-items:center}
 .warn h3{margin-top:12px}
 .warn ul{margin:4px 0 10px;padding-left:20px}
-.warn .btn{background:var(--red);border-color:var(--red);color:var(--on-red);margin:4px 0}
+.warn .btn{background:var(--t-red);border-color:var(--t-red);color:var(--t-on-red);margin:4px 0}
 .warn.top{margin-top:0}
 .takeover h1{font-size:1.6rem}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
-nav .in{display:flex;max-width:560px;width:100%}
-nav button{flex:1;flex-direction:column;gap:2px;background:transparent;border:none;border-radius:0;color:var(--muted);padding:8px 2px 10px;font-size:.75rem;font-weight:600;min-width:0}
-nav button .ic{width:24px;height:24px}
-nav button[aria-current="page"]{color:var(--p1);box-shadow:inset 0 3px 0 var(--p1)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--t-card);border-top:1px solid var(--t-line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar .in{display:flex;max-width:560px;width:100%}
+.tabbar button{flex:1;flex-direction:column;gap:2px;background:transparent;border:none;border-radius:0;color:var(--t-muted);padding:8px 2px 10px;font-size:.75rem;font-weight:600;min-width:0}
+.tabbar button .ic{width:24px;height:24px}
+.tabbar button[aria-current="page"]{color:var(--t-p1);box-shadow:inset 0 3px 0 var(--t-p1)}
 .tab{display:none}.tab.on{display:block}
-pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:.88rem;background:var(--surface);padding:12px;border-radius:10px;margin:0 0 12px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;display:none;z-index:9;max-width:90%}
+pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:.88rem;background:var(--t-surface);padding:12px;border-radius:10px;margin:0 0 12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--t-ink);color:var(--t-bg);padding:10px 16px;border-radius:10px;font-weight:600;display:none;z-index:9;max-width:90%}
 .toast.on{display:block}
 svg text{font-family:inherit}
 .hidden{display:none!important}
@@ -109,7 +109,7 @@ svg text{font-family:inherit}
 ul.keys{margin:0;padding-left:20px}
 ul.keys li{margin:0 0 8px}
 @media print{
-  nav,.warn,header,.noprint,.toast{display:none!important}
+  .tabbar,.warn,header,.noprint,.toast{display:none!important}
   .tab{display:none!important}
   #tab-summary{display:block!important}
   body{background:#fff;color:#000}
@@ -139,13 +139,13 @@ ul.keys li{margin:0 0 8px}
 <symbol id="i-today" viewBox="0 -960 960 960"><path d="M284-338.18q-28-28.19-28-69Q256-448 284.18-476q28.19-28 69-28Q394-504 422-475.82q28 28.19 28 69Q450-366 421.82-338q-28.19 28-69 28Q312-310 284-338.18ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-28q0-13.6 9-22.8 9-9.2 23.02-9.2t23.5 9.2Q310-861.6 310-848v28h340v-28q0-13.6 9-22.8 9-9.2 23.02-9.2t23.5 9.2Q715-861.6 715-848v28h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Z"/></symbol>
 </svg>
 <div class="wrap" id="app"></div>
-<nav id="nav" class="hidden"><div class="in">
+<div id="nav" class="tabbar hidden" role="navigation" aria-label="Sections"><div class="in">
   <button data-tab="today"><svg class="ic" aria-hidden="true"><use href="#i-today"/></svg>Today</button>
   <button data-tab="check"><svg class="ic" aria-hidden="true"><use href="#i-fact_check"/></svg>Check-in</button>
   <button data-tab="plan"><svg class="ic" aria-hidden="true"><use href="#i-calendar_month"/></svg>Plan</button>
   <button data-tab="progress"><svg class="ic" aria-hidden="true"><use href="#i-bar_chart"/></svg>Progress</button>
   <button data-tab="summary"><svg class="ic" aria-hidden="true"><use href="#i-description"/></svg>For doctor</button>
-</div></nav>
+</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -479,6 +479,7 @@ document.getElementById('nav').addEventListener('click',function(e){var b=e.targ
 
 function render(){
   var app=document.getElementById('app'),nav=document.getElementById('nav');
+  var hero=document.getElementById('tp-hero');if(hero)hero.hidden=!!state.settings&&!needTerms()&&!viewTerms&&!state.editing;
   if(needTerms()||viewTerms){nav.classList.add('hidden');app.innerHTML=termsHTML();bindTerms();return;}
   if(!state.settings||state.editing){nav.classList.add('hidden');app.innerHTML=setupHTML();bindSetup();return;}
   var lvl=warnLevel();
@@ -707,7 +708,7 @@ function todayHTML(){
       (ph.length?'<p class="allow">'+esc(cap(orList(ph)))+'.</p><p class="muted">That is '+fmt(i.daily)+' units.</p>':
         '<p class="allow">'+fmt(i.daily)+' units</p><p class="muted">'+esc(equiv(i.daily))+'</p>');
   }
-  h+='<div class="row spread" style="margin-top:8px"><div class="muted">So far today: <b style="color:var(--ink)">'+fmt(tot)+'</b> of '+fmt(i.daily)+' units</div></div>'+
+  h+='<div class="row spread" style="margin-top:8px"><div class="muted">So far today: <b style="color:var(--t-ink)">'+fmt(tot)+'</b> of '+fmt(i.daily)+' units</div></div>'+
      '<div class="bar"><i style="width:'+pct+'%"></i></div>';
   if(tot>i.daily)h+='<p>This is over today\'s guide. That is okay to record. Tomorrow, go back to the guide. Do not cut down further than the plan to make up for it.</p>';
   else if(i.phase!=='before'&&state.myDrinks.length){
@@ -717,7 +718,7 @@ function todayHTML(){
   }
   if(i.phase!=='before'){
     var wt=weekTotal(Math.min(i.week,99)),wp=Math.min(100,wt/i.weekly*100||0);
-    h+='<div class="muted" style="margin-top:12px">This week: <b style="color:var(--ink)">'+fmt(wt)+'</b> of '+i.weekly+' units</div><div class="bar"><i style="width:'+wp+'%"></i></div>';
+    h+='<div class="muted" style="margin-top:12px">This week: <b style="color:var(--t-ink)">'+fmt(wt)+'</b> of '+i.weekly+' units</div><div class="bar"><i style="width:'+wp+'%"></i></div>';
     if(wt>i.weekly)h+='<p>This week is over the plan. Keep to the daily guide for the rest of the week. Do not try to make up for it by stopping.</p>';
   }
   h+='</div>';
@@ -840,22 +841,22 @@ function progressHTML(){
   var W=340,H=230,L=6,R=6,T=26,B=40,gw=(W-L-R)/n,bw=Math.min(24,gw*0.38),plotH=H-T-B;
   function y(v){return T+plotH*(1-v/max);}
   var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Weekly units against your plan">';
-  svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(T+plotH)+'" y2="'+(T+plotH)+'" stroke="var(--line)" stroke-width="1"/>';
+  svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(T+plotH)+'" y2="'+(T+plotH)+'" stroke="var(--t-line)" stroke-width="1"/>';
   var lab=n<=8;
   rows.forEach(function(r,ix){
     var cx=L+ix*gw+gw/2,px=cx-bw-1,ax=cx+1;
-    svg+='<rect x="'+px+'" y="'+y(r.pl)+'" width="'+bw+'" height="'+(T+plotH-y(r.pl))+'" rx="3" fill="var(--p3)"/>';
-    if(lab)svg+='<text x="'+(px+bw/2)+'" y="'+(y(r.pl)-5)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+r.pl+'</text>';
+    svg+='<rect x="'+px+'" y="'+y(r.pl)+'" width="'+bw+'" height="'+(T+plotH-y(r.pl))+'" rx="3" fill="var(--t-p3)"/>';
+    if(lab)svg+='<text x="'+(px+bw/2)+'" y="'+(y(r.pl)-5)+'" text-anchor="middle" font-size="11" fill="var(--t-muted)">'+r.pl+'</text>';
     if(r.ac!=null){
-      svg+='<rect x="'+ax+'" y="'+y(r.ac)+'" width="'+bw+'" height="'+Math.max(0,T+plotH-y(r.ac))+'" rx="3" fill="var(--p1)"/>';
-      svg+='<text x="'+(ax+bw/2)+'" y="'+(y(r.ac)-5)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--p1)">'+fmt(r.ac)+'</text>';
+      svg+='<rect x="'+ax+'" y="'+y(r.ac)+'" width="'+bw+'" height="'+Math.max(0,T+plotH-y(r.ac))+'" rx="3" fill="var(--t-p1)"/>';
+      svg+='<text x="'+(ax+bw/2)+'" y="'+(y(r.ac)-5)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--t-p1)">'+fmt(r.ac)+'</text>';
     }
-    svg+='<text x="'+cx+'" y="'+(T+plotH+16)+'" text-anchor="middle" font-size="11" fill="var(--ink)">Wk '+r.w+'</text>';
-    if(r.partial)svg+='<text x="'+cx+'" y="'+(T+plotH+30)+'" text-anchor="middle" font-size="10" fill="var(--muted)">so far</text>';
+    svg+='<text x="'+cx+'" y="'+(T+plotH+16)+'" text-anchor="middle" font-size="11" fill="var(--t-ink)">Wk '+r.w+'</text>';
+    if(r.partial)svg+='<text x="'+cx+'" y="'+(T+plotH+30)+'" text-anchor="middle" font-size="10" fill="var(--t-muted)">so far</text>';
   });
   if(rows.length){var cx0=L+gw/2;
-    svg+='<text x="'+(cx0-bw/2-1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--muted)">plan</text>';
-    svg+='<text x="'+(cx0+bw/2+1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--p1)" font-weight="700">you</text>';}
+    svg+='<text x="'+(cx0-bw/2-1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--t-muted)">plan</text>';
+    svg+='<text x="'+(cx0+bw/2+1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--t-p1)" font-weight="700">you</text>';}
   svg+='</svg>';
   var h='<div class="card"><h2>Units each week</h2>'+svg+'<p class="muted">In each week, the left bar is your plan and the right bar is what you drank.</p></div><div class="card"><ul class="log">';
   rows.forEach(function(r){if(r.ac!=null)h+='<li><span>Week '+r.w+(r.partial?' (so far)':'')+'</span><span><b>'+fmt(r.ac)+'</b> <span class="muted">plan '+r.pl+'</span></span></li>';});
