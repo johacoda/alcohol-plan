@@ -17,6 +17,10 @@
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/taper.webmanifest">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Taper plan">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/miro.css">
@@ -45,6 +49,15 @@
 {{FOOTER}}
 {{TOGGLE}}
 {{SUBSCRIBE}}
+<script>
+/* Installable and usable offline. The worker lives at the site root but only
+   looks after this page. */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/taper-sw.js', { scope: '/habit-lab/taper/' }).catch(function () {})
+  })
+}
+</script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0168b15d6870442b9287d46cf5b564b1"}'></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>

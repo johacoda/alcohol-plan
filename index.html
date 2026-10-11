@@ -28,8 +28,9 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--t-bg);color:var(--t-ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.5}
+body{margin:0;background:var(--t-bg);color:var(--t-ink);font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.5}
 .wrap{max-width:560px;margin:0 auto;padding:16px 16px 112px}
+h1,h2,h3{font-family:"Hanken Grotesk","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 h1{font-size:1.35rem;margin:4px 0 12px;line-height:1.25}
 h2{font-size:1.15rem;margin:0 0 8px;line-height:1.3}
 h3{font-size:1rem;margin:14px 0 6px}
@@ -478,6 +479,30 @@ function bindTerms(){
   $('#tAgree').onclick=function(){state.terms={v:TERMS_V,at:new Date().toISOString()};save();render();window.scrollTo(0,0);};
 }
 
+/* ---------- add to home screen (only where the page has a manifest) ---------- */
+var installEvt=null;
+function standalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
+function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
+/* On iPhone the home screen copy keeps its own record, so it is offered only before
+   the plan starts. Android installs share the record, so it is offered any time. */
+function installHTML(where){
+  if(!document.querySelector('link[rel=manifest]')||standalone()||state.installDismissed)return '';
+  var no='<button class="ghost small" data-inst="no">Not now</button>';
+  if(installEvt)return '<div class="card soft"><h2>Keep it on your phone</h2><p>Add the plan to your home screen. It works without internet.</p>'+
+    '<div class="row"><button data-inst="go">'+ic('add')+'Add to home screen</button>'+no+'</div></div>';
+  if(isIOS()&&where==='setup')return '<div class="card soft"><h2>Keep it on your phone</h2><p>Do this before you start: tap the Share button, then Add to Home Screen. Then open the plan from there.</p>'+no+'</div>';
+  return '';
+}
+function fillInstall(){
+  var slot=document.getElementById('instSlot');if(!slot)return;
+  slot.innerHTML=installHTML(state.settings?'today':'setup');
+  slot.onclick=function(e){var b=e.target.closest('[data-inst]');if(!b)return;
+    if(b.dataset.inst==='go'&&installEvt){installEvt.prompt();installEvt.userChoice.then(function(){installEvt=null;fillInstall();});}
+    else{state.installDismissed=true;save();slot.innerHTML='';}};
+}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();installEvt=e;fillInstall();});
+window.addEventListener('appinstalled',function(){installEvt=null;fillInstall();});
+
 /* ---------- routing ---------- */
 var tab='today', logDay='today', editingDrinks=false;
 function go(t){tab=t;render();window.scrollTo(0,0);}
@@ -515,7 +540,7 @@ function render(){
   html+='<div class="tab'+(tab==='summary'?' on':'')+'" id="tab-summary">'+summaryHTML()+'</div>';
   html+=warnPanel(0);
   app.innerHTML=html;
-  bindMain();
+  bindMain();fillInstall();
 }
 
 /* ---------- drinks editor (setup and "My drinks") ---------- */
@@ -599,7 +624,7 @@ function setupHTML(){
     {start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''});
   var calc=PUBLIC&&!pre&&!state.settings&&!!document.getElementById('tp-units');
   var h=(PUBLIC?'<p class="muted"><a href="'+AUDIT_URL+'" style="color:inherit">Back to Check your drinking</a></p>':'')+
-  '<h1>Set up your plan</h1>'+
+  '<h1>Set up your plan</h1><div id="instSlot"></div>'+
   (pre?'<div class="note"><p style="margin:0">Filled in from Check your drinking. Check it before you start.</p></div>':
     PUBLIC?'':'<p>Fill this in with your doctor.</p>')+
   (calc?'<div id="unitsSlot"></div>':'')+
@@ -696,7 +721,7 @@ function bindSetup(){
     };
     tool.oninput=fromCalc;tool.onchange=fromCalc;tool.onclick=function(){setTimeout(fromCalc,0);};
   }
-  preview();histMsg();waOut();
+  preview();histMsg();waOut();fillInstall();
 }
 /* The calculator's rows, keyed by their units, as drink kinds and sizes. Same map as audit.html. */
 var CALC_DRINKS={
@@ -734,7 +759,7 @@ function overCardHTML(){
 }
 function todayHTML(){
   var t=today(),day=logDay==='today'?t:addDays(t,-1),i=info(t),h='';
-  h+=overCardHTML();
+  h+=overCardHTML()+'<div id="instSlot"></div>';
   if(i.phase==='before'){
     h+='<div class="card soft"><p>Your plan starts on <b>'+esc(niceY(state.settings.startDate))+'</b>. Until then, keep a record of what you drink. This helps '+esc(doc())+'.</p></div>';
   } else {
