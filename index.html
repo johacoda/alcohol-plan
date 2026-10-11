@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Alcohol Plan</title>
+<style>
+:root{
+  --bg:#FAFAFA;--surface:#F2F2F0;--card:#FFFFFF;--ink:#0D0D0B;--muted:#55534D;--line:#DEDDD8;
+  --p1:#3C3158;--p2:#73629F;--p3:#AFA4CF;--ptint:#ECE8F4;--on-p1:#FAFAFA;
+  --red:#C0392B;--red-ink:#A93226;--red-tint:#FBEDEB;--on-red:#FFFFFF;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121210;--surface:#1C1B18;--card:#232220;--ink:#F2F2F0;--muted:#B5B3AC;--line:#3A3935;
+    --p1:#DCD3F2;--p2:#A897D4;--p3:#6F5F9E;--ptint:#2C2740;--on-p1:#0D0D0B;
+    --red:#E5695C;--red-ink:#F2978D;--red-tint:#2E1B19;--on-red:#0D0D0B;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121210;--surface:#1C1B18;--card:#232220;--ink:#F2F2F0;--muted:#B5B3AC;--line:#3A3935;
+  --p1:#DCD3F2;--p2:#A897D4;--p3:#6F5F9E;--ptint:#2C2740;--on-p1:#0D0D0B;
+  --red:#E5695C;--red-ink:#F2978D;--red-tint:#2E1B19;--on-red:#0D0D0B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.5}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px 112px}
+h1{font-size:1.35rem;margin:4px 0 12px;line-height:1.25}
+h2{font-size:1.15rem;margin:0 0 8px;line-height:1.3}
+h3{font-size:1rem;margin:14px 0 6px}
+p{margin:0 0 10px}
+.muted{color:var(--muted);font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+.soft{background:var(--surface);border:none}
+.big{font-size:2.6rem;font-weight:800;line-height:1;color:var(--p1)}
+.big small{font-size:1rem;font-weight:600;color:var(--muted)}
+.allow{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--p1);margin:2px 0 4px}
+.bar{height:12px;background:var(--surface);border-radius:6px;overflow:hidden;margin:8px 0 6px}
+.bar>i{display:block;height:100%;background:var(--p1);border-radius:6px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.ic{width:1.3em;height:1.3em;fill:currentColor;flex:none;vertical-align:-.28em}
+button,.btn{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--p1);background:var(--p1);color:var(--on-p1);padding:11px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+button.ghost,.btn.ghost{background:transparent;color:var(--p1)}
+button.small{padding:6px 10px;font-size:.9rem}
+button:disabled{opacity:.45;cursor:not-allowed}
+.btn.wide,button.wide{width:100%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drink{background:var(--surface);color:var(--ink);border:2px solid transparent;text-align:left;padding:10px;font-weight:600;line-height:1.3;display:block}
+.drink b{display:block;color:var(--p1);margin-top:4px}
+.drink span{display:block;font-weight:400;font-size:.85rem;color:var(--muted)}
+.drink:active{border-color:var(--p1)}
+.mine{background:var(--surface);border-radius:12px;padding:12px;margin:0 0 10px}
+.mine .head{display:flex;gap:10px;align-items:flex-start}
+.mine .head .ic{color:var(--p1);width:1.6em;height:1.6em}
+.mine .acts{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:10px}
+.mine .acts button{padding:10px 8px}
+.seg{display:flex;background:var(--surface);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;background:transparent;border:none;color:var(--ink);padding:8px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--p1);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills button{background:var(--surface);color:var(--ink);border:2px solid transparent;font-weight:600;padding:8px 12px}
+.pills button[aria-pressed="true"]{border-color:var(--p1);color:var(--p1);background:var(--ptint)}
+.lbl{font-weight:600;margin:12px 0 6px}
+label.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+label.chk:last-child{border-bottom:none}
+label.chk input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--p1)}
+input[type=number],input[type=text],input[type=tel],input[type=date],textarea{font:inherit;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.field{display:block;margin:0 0 14px}
+.field>span{display:block;font-weight:600;margin-bottom:4px}
+.field>small{display:block;margin-top:4px}
+ul.log{list-style:none;padding:0;margin:0}
+ul.log li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+ul.log li:last-child{border-bottom:none}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.82rem;color:var(--muted);font-weight:600}
+tr.now td{background:var(--ptint);font-weight:700}
+.dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:280px;margin:8px 0}
+.dot{aspect-ratio:1;border-radius:50%;border:2px solid var(--p3);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted)}
+.dot.done{background:var(--p1);border-color:var(--p1);color:var(--on-p1)}
+.dot.today{border-color:var(--p1);border-width:3px;color:var(--p1);font-weight:800}
+.note{padding:10px 12px;background:var(--ptint);border-radius:10px;margin:0 0 12px}
+.warn{border:2px solid var(--red);background:var(--red-tint);border-radius:14px;padding:16px;margin:18px 0 14px}
+.warn h2{color:var(--red-ink);display:flex;gap:6px;align-items:center}
+.warn h3{margin-top:12px}
+.warn ul{margin:4px 0 10px;padding-left:20px}
+.warn .btn{background:var(--red);border-color:var(--red);color:var(--on-red);margin:4px 0}
+.warn.top{margin-top:0}
+.takeover h1{font-size:1.6rem}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav .in{display:flex;max-width:560px;width:100%}
+nav button{flex:1;flex-direction:column;gap:2px;background:transparent;border:none;border-radius:0;color:var(--muted);padding:8px 2px 10px;font-size:.75rem;font-weight:600;min-width:0}
+nav button .ic{width:24px;height:24px}
+nav button[aria-current="page"]{color:var(--p1);box-shadow:inset 0 3px 0 var(--p1)}
+.tab{display:none}.tab.on{display:block}
+pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:.88rem;background:var(--surface);padding:12px;border-radius:10px;margin:0 0 12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;display:none;z-index:9;max-width:90%}
+.toast.on{display:block}
+svg text{font-family:inherit}
+.hidden{display:none!important}
+@media print{
+  nav,.warn,header,.noprint,.toast{display:none!important}
+  .tab{display:none!important}
+  #tab-summary{display:block!important}
+  body{background:#fff;color:#000}
+  pre{background:#fff;font-size:11pt}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<!-- Material Symbols Rounded, weight 400 (Apache License 2.0, Google) -->
+<symbol id="i-sports_bar" viewBox="0 -960 960 960"><path d="M310-180h300v-430h-90q-28 0-47 15.5T430-552q-26 29-57 51t-63 30v291Zm-60 0v-292q-52-14-91-53t-39-95.18q0-53.17 30.5-94.3 30.5-41.13 78.5-57.18 23-48.15 68.5-78.24Q343-880 400-880q35 0 65.5 12t55.5 33q10-2 19-3.5t20-1.5q66 0 113 47t47 113q0 22-9 44t-23 36h92q24.75 0 42.38 17.62Q840-564.75 840-540v280q0 24.75-17.62 42.37Q804.75-200 780-200H670v20q0 24.75-17.62 42.37Q634.75-120 610-120H310q-24.75 0-42.37-17.63Q250-155.25 250-180Zm-70-440q0 38 31 64t69 26q32 0 58-17.5t53-50.5q23-28 55-50t74-22h140q0-45-26.5-77.5T560-780q-18 0-35.5 5.5L507-769l-19-16q-18-16-41-25.5t-47-9.5q-35 0-67 18t-47 50l-14 30-32 11q-26 9-43 36t-17 55Zm490 360h110v-280H670v280Zm-360 80h300-300Z"/></symbol>
+<symbol id="i-wine_bar" viewBox="0 -960 960 960"><path d="M450-180v-185q-99-14-154.5-79.7Q240-510.41 240-600v-210q0-12.75 8.63-21.38Q257.25-840 270-840h420q12.75 0 21.38 8.62Q720-822.75 720-810v210q0 89.59-55.5 155.3Q609-379 510-365v185h100q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H350q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h100Zm150.5-287.5Q652-515 658-570H302q5 55 56.86 102.5 51.85 47.5 121 47.5 69.14 0 120.64-47.5ZM300-630h360v-150H300v150Zm180 210Z"/></symbol>
+<symbol id="i-liquor" viewBox="0 -960 960 960"><path d="M198-140v-141q-35-10-56.5-38.5T120-386v-304q0-13 8.5-21.5T150-720h156q13 0 21.5 8.5T336-690v304q0 35-21.5 65T258-281v141h48q13 0 21.5 8.5T336-110q0 13-8.5 21.5T306-80H150q-13 0-21.5-8.5T120-110q0-13 8.5-21.5T150-140h48Zm-18-359h96v-161h-96v161Zm48 161q19 0 33.5-14.5T276-386v-53h-96v53q0 19 14.5 33.5T228-338ZM520-80q-24 0-42-18t-18-42v-408q0-20 11-32t31-21l38-17q24-11 35-27t11-39v-161q0-16 9.5-25.5T621-880h94q16 0 25.5 9.5T750-845v161q0 23 13.5 39t37.5 27l38 17q19 8 30 20.5t11 32.5v408q0 24-18 42t-42 18H520Zm126-696h44v-44h-44v44ZM520-465h300v-83l-42-16q-40-15-64-49t-24-75v-28h-44v28q0 41-22.5 72T563-568l-43 20v83Zm0 325h300v-103H520v103Zm0-163h300v-102H520v102ZM228-439Zm292 136v-102 102Z"/></symbol>
+<symbol id="i-local_bar" viewBox="0 -960 960 960"><path d="M450-180v-244L134-764q-6-6-9-14.5t-3-16.5q0-19 13-32t32-13h626q19 0 32 13t13 32q0 8-3 16.5t-9 14.5L510-424v244h180q13 0 21.5 8.5T720-150q0 13-8.5 21.5T690-120H270q-13 0-21.5-8.5T240-150q0-13 8.5-21.5T270-180h180ZM281-695h398l83-81H198l83 81Zm199 216 144-156H336l144 156Zm0 0Z"/></symbol>
+<symbol id="i-add" viewBox="0 -960 960 960"><path d="M450-450H230q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h220v-220q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62 8.5 8.63 8.5 21.38v220h220q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H510v220q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63-8.5-8.62-8.5-21.37v-220Z"/></symbol>
+<symbol id="i-undo" viewBox="0 -960 960 960"><path d="M289-200q-13 0-21.5-8.5T259-230q0-13 8.5-21.5T289-260h280q70 0 120.5-46.5T740-422q0-69-50.5-115.5T569-584H274l93 93q9 9 9 21t-9 21q-9 9-21 9t-21-9L181-593q-5-5-7-10t-2-11q0-6 2-11t7-10l144-144q9-9 21-9t21 9q9 9 9 21t-9 21l-93 93h294q95 0 163.5 64T800-422q0 94-68.5 158T568-200H289Z"/></symbol>
+<symbol id="i-fact_check" viewBox="0 -960 960 960"><path d="M132-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h696q24 0 42 18t18 42v600q0 24-18 42t-42 18H132Zm0-60h696v-600H132v600Zm228-100q17 0 28.5-11.5T400-320q0-17-11.5-28.5T360-360H240q-17 0-28.5 11.5T200-320q0 17 11.5 28.5T240-280h120Zm222-193-29-29q-12-12-28-11.5T497-501q-11 12-11.5 28t11.5 28l64 64q9 9 21 9t21-9l149-149q12-12 12-28t-12-28q-12-12-28.5-12T695-586L582-473Zm-222 33q17 0 28.5-11.5T400-480q0-17-11.5-28.5T360-520H240q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440h120Zm0-160q17 0 28.5-11.5T400-640q0-17-11.5-28.5T360-680H240q-17 0-28.5 11.5T200-640q0 17 11.5 28.5T240-600h120ZM132-180v-600 600Z"/></symbol>
+<symbol id="i-calendar_month" viewBox="0 -960 960 960"><path d="M180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-28q0-13.6 9-22.8 9-9.2 23.02-9.2t23.5 9.2Q310-861.6 310-848v28h340v-28q0-13.6 9-22.8 9-9.2 23.02-9.2t23.5 9.2Q715-861.6 715-848v28h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Zm300 230q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/></symbol>
+<symbol id="i-bar_chart" viewBox="0 -960 960 960"><path d="M690-160q-12.75 0-21.37-8.63Q660-177.25 660-190v-220q0-12.75 8.63-21.38Q677.25-440 690-440h80q12.75 0 21.38 8.62Q800-422.75 800-410v220q0 12.75-8.62 21.37Q782.75-160 770-160h-80Zm-250 0q-12.75 0-21.37-8.63Q410-177.25 410-190v-580q0-12.75 8.63-21.38Q427.25-800 440-800h80q12.75 0 21.38 8.62Q550-782.75 550-770v580q0 12.75-8.62 21.37Q532.75-160 520-160h-80Zm-250 0q-12.75 0-21.37-8.63Q160-177.25 160-190v-380q0-12.75 8.63-21.38Q177.25-600 190-600h80q12.75 0 21.38 8.62Q300-582.75 300-570v380q0 12.75-8.62 21.37Q282.75-160 270-160h-80Z"/></symbol>
+<symbol id="i-description" viewBox="0 -960 960 960"><path d="M349-250h262q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H349q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5Zm0-170h262q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H349q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h336q12.44 0 23.72 5T599-862l183 183q8 8 13 19.28 5 11.28 5 23.72v496q0 24-18 42t-42 18H220Zm331-584v-156H220v680h520v-494H581q-12.75 0-21.37-8.63Q551-651.25 551-664ZM220-820v186-186 680-680Z"/></symbol>
+<symbol id="i-warning" viewBox="0 -960 960 960"><path d="M92-120q-9 0-15.5-4T66-135q-4-7-4.5-14.5T66-165l388-670q5-8 11.5-11.5T480-850q8 0 14.5 3.5T506-835l388 670q5 8 4.5 15.5T894-135q-4 7-10.5 11t-15.5 4H92Zm52-60h672L480-760 144-180Zm361.5-65.5Q514-254 514-267t-8.5-21.5Q497-297 484-297t-21.5 8.5Q454-280 454-267t8.5 21.5Q471-237 484-237t21.5-8.5Zm0-111Q514-365 514-378v-164q0-13-8.5-21.5T484-572q-13 0-21.5 8.5T454-542v164q0 13 8.5 21.5T484-348q13 0 21.5-8.5ZM480-470Z"/></symbol>
+<symbol id="i-call" viewBox="0 -960 960 960"><path d="M795-120q-116 0-236.5-56T335-335Q232-438 176-558.5T120-795q0-19.29 12.86-32.14Q145.71-840 165-840h140q14 0 24 10t14 25l26.93 125.64Q372-665 369.5-653.5t-10.73 19.73L259-533q26 44 55 82t64 72q37 38 78 69.5t86 55.5l95-98q10-11 23.15-15 13.15-4 25.85-2l119 26q15 4 25 16.04 10 12.05 10 26.96v135q0 19.29-12.86 32.14Q814.29-120 795-120ZM229-588l81-82-23-110H180q2 42 13.5 88.5T229-588Zm369 363q41 19 89 31t93 14v-107l-103-21-79 83ZM229-588Zm369 363Z"/></symbol>
+<symbol id="i-chat" viewBox="0 -960 960 960"><path d="M240-240 131-131q-14 14-32.5 6.34Q80-132.31 80-152v-668q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H240Zm-26-60h606v-520H140v600l74-80Zm-74 0v-520 520Zm130-99h253q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H270q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5Zm0-130h420q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H270q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5Zm0-130h420q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H270q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5Z"/></symbol>
+<symbol id="i-bedtime" viewBox="0 -960 960 960"><path d="M484-80q-84 0-157.5-32t-128-86.5Q144-253 112-326.5T80-484q0-132 77.5-238T361-868q17-5 31 5t12 27q-7 88 23.5 169.5T521-522q63 63 145 94t170 24q17-2 26.5 13t4.5 32q-40 125-145.5 202T484-80Zm0-60q100 0 182-57t132-145q-90-8-173-41.5T478.5-480Q415-543 382-625.5T341-797q-88 48-144.5 130.5T140-484q0 143.33 100.33 243.67Q340.67-140 484-140Zm-6-340Z"/></symbol>
+<symbol id="i-edit" viewBox="0 -960 960 960"><path d="M180-180h44l472-471-44-44-472 471v44Zm-30 60q-13 0-21.5-8.5T120-150v-73q0-12 5-23.5t13-19.5l557-556q8-8 19-12.5t23-4.5q11 0 22 4.5t20 12.5l44 44q9 9 13 20t4 22q0 11-4.5 22.5T823-694L266-138q-8 8-19.5 13t-23.5 5h-73Zm629-617-41-41 41 41Zm-105 64-22-22 44 44-22-22Z"/></symbol>
+<symbol id="i-delete" viewBox="0 -960 960 960"><path d="M261-120q-24.75 0-42.37-17.63Q201-155.25 201-180v-570h-11q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h158q0-13 8.63-21.5 8.62-8.5 21.37-8.5h204q12.75 0 21.38 8.62Q612-822.75 612-810h158q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5h-11v570q0 24.75-17.62 42.37Q723.75-120 699-120H261Zm438-630H261v570h438v-570ZM418.5-274.63q8.5-8.62 8.5-21.37v-339q0-12.75-8.68-21.38-8.67-8.62-21.5-8.62-12.82 0-21.32 8.62-8.5 8.63-8.5 21.38v339q0 12.75 8.68 21.37 8.67 8.63 21.5 8.63 12.82 0 21.32-8.63Zm166 0q8.5-8.62 8.5-21.37v-339q0-12.75-8.68-21.38-8.67-8.62-21.5-8.62-12.82 0-21.32 8.62-8.5 8.63-8.5 21.38v339q0 12.75 8.68 21.37 8.67 8.63 21.5 8.63 12.82 0 21.32-8.63ZM261-750v570-570Z"/></symbol>
+<symbol id="i-today" viewBox="0 -960 960 960"><path d="M284-338.18q-28-28.19-28-69Q256-448 284.18-476q28.19-28 69-28Q394-504 422-475.82q28 28.19 28 69Q450-366 421.82-338q-28.19 28-69 28Q312-310 284-338.18ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-28q0-13.6 9-22.8 9-9.2 23.02-9.2t23.5 9.2Q310-861.6 310-848v28h340v-28q0-13.6 9-22.8 9-9.2 23.02-9.2t23.5 9.2Q715-861.6 715-848v28h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Z"/></symbol>
+</svg>
+<div class="wrap" id="app"></div>
+<nav id="nav" class="hidden"><div class="in">
+  <button data-tab="today"><svg class="ic" aria-hidden="true"><use href="#i-today"/></svg>Today</button>
+  <button data-tab="check"><svg class="ic" aria-hidden="true"><use href="#i-fact_check"/></svg>Check-in</button>
+  <button data-tab="plan"><svg class="ic" aria-hidden="true"><use href="#i-calendar_month"/></svg>Plan</button>
+  <button data-tab="progress"><svg class="ic" aria-hidden="true"><use href="#i-bar_chart"/></svg>Progress</button>
+  <button data-tab="summary"><svg class="ic" aria-hidden="true"><use href="#i-description"/></svg>For doctor</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='myAlcoholPlan.v1';
+/* Drink kinds for "My drinks". Strengths: beer, wine, spirits, bitters from the brief.
+   Stout 7.5% = Guinness Foreign Extra Stout. Strong rum 69% = Clarke's Court Pure White and
+   Rivers Royale (export bottling) in Grenada. Rivers sold at home in Grenada is often 75%. */
+var CATS={
+  beer:{name:'Beer or lager',short:'beer',icon:'sports_bar',pct:5,ph:'For example: Carib',
+    sizes:[{ml:330,n:'bottle'},{ml:330,n:'can'},{ml:600,n:'large bottle'}],noun:'bottle'},
+  stout:{name:'Stout',short:'stout',icon:'sports_bar',pct:7.5,ph:'For example: Guinness',
+    sizes:[{ml:330,n:'bottle'},{ml:600,n:'large bottle'}],noun:'bottle'},
+  wine:{name:'Wine',short:'wine',icon:'wine_bar',pct:13,ph:'',
+    sizes:[{ml:125,n:'small glass'},{ml:175,n:'glass'},{ml:750,n:'bottle'}],noun:'glass'},
+  spirits:{name:'Spirits (gin, whisky, vodka, rum)',short:'spirits',icon:'liquor',pct:40,ph:'For example: gin',
+    sizes:[{ml:35,n:'shot'},{ml:200,n:'flask'},{ml:375,n:'medium bottle'},{ml:750,n:'bottle'}],noun:'bottle'},
+  overproof:{name:'Strong rum (overproof)',short:'strong rum',icon:'liquor',pct:69,ph:'For example: Clarke\'s Court',
+    sizes:[{ml:35,n:'shot'},{ml:200,n:'flask'},{ml:750,n:'bottle'}],noun:'bottle'},
+  bitters:{name:'Herbal bitters',short:'bitters',icon:'liquor',pct:40,ph:'',
+    sizes:[{ml:35,n:'shot'},{ml:200,n:'small bottle'}],noun:'bottle'},
+  other:{name:'Something else',short:'',icon:'local_bar',pct:'',ph:'For example: palm wine',
+    sizes:[{ml:null,n:'glass'},{ml:null,n:'cup'},{ml:null,n:'can'},{ml:null,n:'bottle'}],noun:'glass'}
+};
+var CAT_ORDER=['beer','stout','wine','spirits','overproof','bitters','other'];
+var MAX_MINE=3;
+var DRINKS=[
+  {name:'Large bottle of beer',ml:600,pct:5,icon:'sports_bar'},
+  {name:'Can of beer',ml:330,pct:5,icon:'sports_bar'},
+  {name:'Large bottle of stout',ml:600,pct:7.5,icon:'sports_bar'},
+  {name:'Glass of wine',ml:175,pct:13,icon:'wine_bar'},
+  {name:'Shot of spirits',ml:35,pct:40,icon:'liquor'},
+  {name:'Shot of strong rum',ml:35,pct:69,icon:'liquor'},
+  {name:'Small bottle of herbal bitters',ml:200,pct:40,icon:'liquor'},
+  {name:'Bottle of spirits',ml:750,pct:40,icon:'liquor'}
+];
+var SIGNS_DOC=[
+  {id:'shake',text:'My hands shook in the morning'},
+  {id:'sick',text:'I was sweating, felt sick or vomited in the morning'},
+  {id:'early',text:'I needed a drink early in the day to feel normal'}
+];
+var SIGNS_AMB=[
+  {id:'fit',text:'I had a fit (seizure)'},
+  {id:'confused',text:'I felt confused'},
+  {id:'seeing',text:'I saw or heard things that were not there'},
+  {id:'double',text:'I saw double'},
+  {id:'unsteady',text:'I was unsteady on my feet'}
+];
+var SLEEP=['Well','Okay','Badly'];
+var CRAVE=['None','A little','Strong','Very strong'];
+var DAYN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var WA_MAX=1000;
+
+/* ---------- storage ---------- */
+var memState=null, storageOK=true;
+function load(){
+  try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}
+  catch(e){storageOK=false;return memState;}
+}
+function save(){
+  memState=state;
+  try{localStorage.setItem(KEY,JSON.stringify(state));}
+  catch(e){storageOK=false;}
+}
+var state=load()||{};
+state.settings=state.settings||null;
+state.drinks=state.drinks||{};
+state.checkins=state.checkins||{};
+state.custom=state.custom||[];
+state.myDrinks=state.myDrinks||[];
+state.overPrompted=state.overPrompted||{};
+/* version 1 kept a plain phone number for the doctor */
+if(state.settings&&state.settings.doctorWa==null){
+  var mig=normWa(state.settings.doctorPhone);
+  state.settings.doctorWa=mig.ok?mig.d:'';
+  state.settings.patientName=state.settings.patientName||'';
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function r1(n){return Math.round(n*10)/10;}
+function fmt(n){var v=r1(n);return (v%1===0)?String(v):v.toFixed(1);}
+function half(n){return Math.round(n*2)/2;}
+function unitsOf(ml,pct){return ml*pct/1000;}
+function key(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function parseKey(k){var a=k.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]);}
+function addDays(k,n){var d=parseKey(k);d.setDate(d.getDate()+n);return key(d);}
+function diffDays(a,b){return Math.round((parseKey(b)-parseKey(a))/86400000);}
+function today(){return key(new Date());}
+function nice(k){var d=parseKey(k);return DAYN[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()];}
+function niceY(k){return nice(k)+' '+parseKey(k).getFullYear();}
+function doc(){return (state.settings&&state.settings.doctorName)?state.settings.doctorName:'your doctor';}
+function Doc(){var d=doc();return d.charAt(0).toUpperCase()+d.slice(1);}
+function plural(n,w){return n+' '+w+(n===1?'':'s');}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function ic(n){return '<svg class="ic" aria-hidden="true"><use href="#i-'+n+'"/></svg>';}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('on');},2600);}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+
+/* ---------- WhatsApp ---------- */
+function normWa(raw){
+  var s=String(raw||'').trim();if(!s)return {ok:true,d:''};
+  var plus=s.charAt(0)==='+',d=s.replace(/\D/g,'');
+  if(!plus&&d.indexOf('00')===0)d=d.slice(2);
+  if(d.charAt(0)==='0')return {ok:false,msg:'Start the WhatsApp number with the country code, not 0. For example, 1 473 for Grenada.'};
+  if(d.length<8||d.length>15)return {ok:false,msg:'Check the WhatsApp number. It looks too short or too long.'};
+  return {ok:true,d:d};
+}
+function hasWa(){return !!(state.settings&&state.settings.doctorWa);}
+function waLink(text){return 'https://wa.me/'+state.settings.doctorWa+'?text='+encodeURIComponent(text);}
+function waBtn(text,label,extra){return '<a class="btn'+(extra?' '+extra:'')+'" target="_blank" rel="noopener" href="'+esc(waLink(text))+'">'+ic('chat')+esc(label)+'</a>';}
+function waDelay(){return '<p class="muted" style="margin-top:10px">'+esc(Doc())+' may not see your message straight away. If you have any sign on the ambulance list, call the ambulance first.</p>';}
+function who(){var n=state.settings&&state.settings.patientName;return n?n:'Patient';}
+function clip(t){return t.length>WA_MAX?t.slice(0,WA_MAX-3)+'...':t;}
+
+/* ---------- my drinks ---------- */
+function newDrink(cat){var c=CATS[cat],s=c.sizes[0];return {cat:cat,size:0,ml:s?s.ml:null,pct:c.pct,name:''};}
+function dUnits(d){return unitsOf(+d.ml,+d.pct);}
+function dNoun(d){var c=CATS[d.cat];return d.size>=0&&c.sizes[d.size]?c.sizes[d.size].n:c.noun;}
+function dWhat(d){return d.name||CATS[d.cat].short;}
+function pl(n){return /ss$/.test(n)?n+'es':n+'s';}
+function amount(c,noun){
+  if(c===0.5)return 'half a '+noun;
+  return Math.floor(c)+(c%1?' and a half ':' ')+(c>1?pl(noun):noun);
+}
+function dLabel(d,f){return cap((f===0.5?'half a ':'')+dNoun(d))+' of '+dWhat(d);}
+function smallest(d){
+  var best=null;CATS[d.cat].sizes.forEach(function(s){if(s.ml&&s.ml<+d.ml&&(!best||s.ml<best.ml))best=s;});
+  return best;
+}
+/* How much of this drink fits in u units. Rounds down to a half, so it never shows more than the plan.
+   Under one container, it uses the smallest container of the same kind instead. */
+function fit(u,d){
+  var cu=dUnits(d);if(!(cu>0)||!(u>0))return null;
+  var c=Math.floor(u/cu*2)/2;
+  if(c>=1)return {c:c,noun:dNoun(d)};
+  var sm=smallest(d),c2=0;
+  if(sm){c2=Math.floor(u/unitsOf(sm.ml,+d.pct)*2)/2;if(c2>=1)return {c:c2,noun:sm.n};}
+  if(c>=0.5)return {c:0.5,noun:dNoun(d)};
+  if(c2>=0.5)return {c:0.5,noun:sm.n};
+  return null;
+}
+function phrases(u){
+  return state.myDrinks.map(function(d){var f=fit(u,d);return f?amount(f.c,f.noun)+' of your '+dWhat(d):null;}).filter(Boolean);
+}
+function orList(a){return a.join(', or ');}
+function equiv(u){
+  var b=Math.floor(u/3*2)/2,sh=Math.floor(u/1.4);
+  return 'About '+fmt(b)+' large '+(b===1?'bottle':'bottles')+' of beer, or '+plural(sh,'shot')+' of spirits.';
+}
+
+/* ---------- plan maths ---------- */
+function buildPlan(s){
+  var S=+s.start,T=+s.target,N=+s.weeks,r=Math.pow(T/S,1/N),out=[];
+  for(var k=1;k<=N;k++){
+    var w=(k===N)?T:Math.round(S*Math.pow(r,k));
+    var dry=0;
+    if(k>=3&&w/7<=4)dry=Math.min(k-2,2);
+    out.push({n:k,weekly:w,dry:dry,daily:half(w/(7-dry))});
+  }
+  return out;
+}
+function plan(){return buildPlan(state.settings);}
+function info(k){
+  var s=state.settings,p=plan(),d=diffDays(s.startDate,k);
+  if(d<0)return {phase:'before',daysTo:-d,week:0,weekly:+s.start,daily:half(s.start/7),dry:0};
+  var wk=Math.floor(d/7)+1;
+  if(wk>p.length){var L=p[p.length-1];return {phase:'after',week:wk,weekly:L.weekly,daily:L.daily,dry:L.dry,day:d+1};}
+  var w=p[wk-1];
+  return {phase:'plan',week:wk,weekly:w.weekly,daily:w.daily,dry:w.dry,day:d+1};
+}
+function weekStart(wk){return addDays(state.settings.startDate,(wk-1)*7);}
+function dayTotal(k){return (state.drinks[k]||[]).reduce(function(a,x){return a+x.u;},0);}
+function weekTotal(wk){var s=weekStart(wk),t=0;for(var i=0;i<7;i++){var d=addDays(s,i);if(d<=today())t+=dayTotal(d);}return t;}
+function hasRecord(k){return (state.drinks[k]&&state.drinks[k].length>0)||!!state.checkins[k];}
+
+/* ---------- warning level ---------- */
+function warnLevel(){
+  var c=state.checkins[today()];
+  if(!c||c.cleared)return 0;
+  var s=c.signs||[];
+  if(s.some(function(id){return SIGNS_AMB.some(function(x){return x.id===id;});}))return 2;
+  return s.length?1:0;
+}
+function signText(id){var x=SIGNS_DOC.concat(SIGNS_AMB).filter(function(z){return z.id===id;})[0];return x?x.text:id;}
+
+/* ---------- red panel: the only red element ---------- */
+function warnPanel(level){
+  var s=state.settings||{},amb='',dr='';
+  amb='<h3>Call an ambulance now if you have any of these</h3><ul>'+
+    '<li>A fit (seizure)</li><li>You feel confused</li><li>You see or hear things that are not there</li>'+
+    '<li>You see double</li><li>You are unsteady on your feet</li></ul>'+
+    (s.emergency?'<a class="btn wide" href="tel:'+esc(s.emergency.replace(/[^\d+]/g,''))+'">'+ic('call')+'Call the ambulance: '+esc(s.emergency)+'</a>':'');
+  dr='<h3>Contact '+esc(doc())+' today if you have any of these</h3><ul>'+
+    '<li>Your hands shake in the morning, and a drink settles them</li>'+
+    '<li>You sweat, feel sick or vomit in the morning</li>'+
+    '<li>You need a drink early in the day to feel normal</li></ul>'+
+    '<p>Do not cut down any further until you have spoken to '+esc(doc())+'.</p>'+
+    (s.doctorWa?'<a class="btn" href="tel:+'+esc(s.doctorWa)+'">'+ic('call')+'Call '+esc(doc())+'</a>':'');
+  var head=level===2?'<h2>'+ic('warning')+'Get help now</h2><p>You ticked a sign that needs help straight away.</p>':
+           level===1?'<h2>'+ic('warning')+'Contact '+esc(doc())+' today</h2><p>You ticked a warning sign today.</p>':
+           '<h2>'+ic('warning')+'Warning signs</h2>';
+  var body=level===1?(dr+amb):(amb+dr);
+  return '<section class="warn'+(level?' top':'')+'" aria-live="polite">'+head+body+'</section>';
+}
+function warnMsg(){
+  var t=today(),c=state.checkins[t]||{},i=info(t),L=[];
+  L.push(who()+': alcohol plan. Warning signs on '+niceY(t)+':');
+  (c.signs||[]).forEach(function(id){L.push('- '+signText(id));});
+  L.push('Units today: '+fmt(dayTotal(t))+(i.phase!=='before'?' (guide '+fmt(i.daily)+' a day).':'.'));
+  if(i.phase==='plan')L.push('Week '+i.week+' of '+plan().length+'.');
+  if(c.note)L.push('Note: '+c.note);
+  return clip(L.join('\n'));
+}
+
+/* ---------- routing ---------- */
+var tab='today', logDay='today', editingDrinks=false;
+function go(t){tab=t;render();window.scrollTo(0,0);}
+document.getElementById('nav').addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(b.dataset.tab);});
+
+function render(){
+  var app=document.getElementById('app'),nav=document.getElementById('nav');
+  if(!state.settings||state.editing){nav.classList.add('hidden');app.innerHTML=setupHTML();bindSetup();return;}
+  var lvl=warnLevel();
+  if(lvl){
+    nav.classList.add('hidden');
+    var wa='';
+    if(hasWa()){
+      wa='<div class="card">'+(lvl===2?'<p><b>Call the ambulance first. Then send this to '+esc(doc())+'.</b></p>':'')+
+        waBtn(warnMsg(),'Send a message to '+doc(),'wide'+(lvl===2?' ghost':''))+waDelay()+'</div>';
+    }
+    app.innerHTML='<div class="takeover">'+warnPanel(lvl)+wa+
+      '<div class="card soft"><p>Your record is kept. When you have had help, you can go back to the tracker.</p>'+
+      '<button id="cleared">I have had help. Show the tracker.</button></div></div>';
+    document.getElementById('cleared').onclick=function(){state.checkins[today()].cleared=true;save();render();};
+    return;
+  }
+  if(editingDrinks){nav.classList.add('hidden');app.innerHTML=drinksScreenHTML();bindDrinksScreen();return;}
+  nav.classList.remove('hidden');
+  Array.prototype.forEach.call(nav.querySelectorAll('button'),function(b){b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');});
+  var html='<header><h1>My alcohol plan</h1></header>';
+  if(!storageOK)html+='<div class="note">This phone is not saving your record. Use the "For doctor" page often to keep a copy.</div>';
+  html+='<div class="tab'+(tab==='today'?' on':'')+'" id="tab-today">'+todayHTML()+'</div>';
+  html+='<div class="tab'+(tab==='check'?' on':'')+'" id="tab-check">'+checkHTML()+'</div>';
+  html+='<div class="tab'+(tab==='plan'?' on':'')+'" id="tab-plan">'+planHTML()+'</div>';
+  html+='<div class="tab'+(tab==='progress'?' on':'')+'" id="tab-progress">'+progressHTML()+'</div>';
+  html+='<div class="tab'+(tab==='summary'?' on':'')+'" id="tab-summary">'+summaryHTML()+'</div>';
+  html+=warnPanel(0);
+  app.innerHTML=html;
+  bindMain();
+}
+
+/* ---------- drinks editor (setup and "My drinks") ---------- */
+var ed=[];
+function edHTML(){
+  var h='';
+  ed.forEach(function(d,i){
+    var c=d.cat?CATS[d.cat]:null;
+    h+='<div class="card" data-i="'+i+'"><div class="row spread"><h3 style="margin:0">Drink '+(i+1)+'</h3>'+
+      (ed.length>1?'<button type="button" class="small ghost" data-act="del">'+ic('delete')+'Remove</button>':'')+'</div>'+
+      '<p class="lbl">What kind of drink?</p><div class="pills" data-k="cat">'+
+      CAT_ORDER.map(function(k){return '<button type="button" data-v="'+k+'" aria-pressed="'+(d.cat===k)+'">'+ic(CATS[k].icon)+esc(CATS[k].name)+'</button>';}).join('')+'</div>';
+    if(c){
+      h+='<p class="lbl">What size?</p><div class="pills" data-k="size">'+
+        c.sizes.map(function(s,j){return '<button type="button" data-v="'+j+'" aria-pressed="'+(d.size===j)+'">'+esc(cap(s.n))+(s.ml?' '+s.ml+'ml':'')+'</button>';}).join('')+
+        (d.cat!=='other'?'<button type="button" data-v="-1" aria-pressed="'+(d.size===-1)+'">Other size</button>':'')+'</div>';
+      if(d.size===-1||!c.sizes[d.size]||!c.sizes[d.size].ml)
+        h+='<label class="field" style="margin-top:12px"><span>How many millilitres?</span><input type="number" inputmode="decimal" min="1" data-f="ml" value="'+esc(d.ml==null?'':d.ml)+'"><small class="muted">It is written on the label, for example 500ml.</small></label>';
+      h+='<label class="field" style="margin-top:12px"><span>'+(d.cat==='other'?'What is it called?':'Name (you can leave this empty)')+'</span>'+
+        '<input type="text" maxlength="40" data-f="name" placeholder="'+esc(c.ph)+'" value="'+esc(d.name)+'"></label>'+
+        '<label class="field"><span>Alcohol %</span><input type="number" inputmode="decimal" min="0.1" max="96" step="0.1" data-f="pct" value="'+esc(d.pct)+'">'+
+        '<small class="muted">Check the label. Change this if it is different.</small></label>'+
+        '<p class="muted" data-out style="margin:0">'+esc(edUnitsLine(d))+'</p>';
+    }
+    h+='</div>';
+  });
+  if(ed.length<MAX_MINE)h+='<button type="button" class="ghost" data-act="add">'+ic('add')+(ed.length?'Add another drink':'Add a drink')+'</button>';
+  return h;
+}
+function edUnitsLine(d){var u=dUnits(d);return u>0?'One '+dNoun(d)+' is '+fmt(u)+' units.':'The units will show here.';}
+function edValid(){
+  if(!ed.length)return 'Add at least one drink you usually have.';
+  for(var i=0;i<ed.length;i++){var d=ed[i],n='Drink '+(i+1)+': ';
+    if(!d.cat)return n+'choose what kind of drink.';
+    if(!(+d.ml>0))return n+'enter the millilitres.';
+    if(!(+d.pct>0&&+d.pct<=96))return n+'enter the alcohol % from the label.';
+    if(d.cat==='other'&&!d.name.trim())return n+'enter what it is called.';
+  }
+  return '';
+}
+function bindEd(box){
+  function draw(){box.innerHTML=edHTML();}
+  box.onclick=function(e){
+    var b=e.target.closest('button');if(!b)return;
+    var card=b.closest('[data-i]'),i=card?+card.dataset.i:-1,act=b.dataset.act,pills=b.closest('.pills');
+    if(act==='add'){ed.push({cat:'',size:0,ml:null,pct:'',name:''});draw();return;}
+    if(act==='del'){ed.splice(i,1);draw();return;}
+    if(pills&&pills.dataset.k==='cat'){var nm=ed[i].name;ed[i]=newDrink(b.dataset.v);ed[i].name=nm;draw();return;}
+    if(pills&&pills.dataset.k==='size'){var d=ed[i],j=+b.dataset.v;d.size=j;
+      d.ml=j>=0?CATS[d.cat].sizes[j].ml:null;draw();}
+  };
+  box.oninput=function(e){
+    var f=e.target.dataset.f;if(!f)return;
+    var card=e.target.closest('[data-i]'),d=ed[+card.dataset.i];
+    d[f]=f==='name'?e.target.value:(e.target.value===''?null:+e.target.value);
+    card.querySelector('[data-out]').textContent=edUnitsLine(d);
+  };
+  draw();
+}
+function drinksScreenHTML(){
+  return '<h1>My drinks</h1><p>Add up to '+MAX_MINE+' drinks you usually have. The app uses them to show your daily guide.</p>'+
+    '<div id="ed"></div><div id="edErr" class="note hidden"></div>'+
+    '<div class="row" style="margin-top:6px"><button id="edSave">Save my drinks</button><button class="ghost" id="edCancel">Cancel</button></div>';
+}
+function bindDrinksScreen(){
+  bindEd($('#ed'));
+  $('#edSave').onclick=function(){var err=edValid(),el=$('#edErr');
+    if(err){el.textContent=err;el.classList.remove('hidden');return;}
+    state.myDrinks=clone(ed);save();editingDrinks=false;render();window.scrollTo(0,0);toast('Your drinks are saved');};
+  $('#edCancel').onclick=function(){editingDrinks=false;render();window.scrollTo(0,0);};
+}
+
+/* ---------- setup ---------- */
+function setupHTML(){
+  var s=state.settings||{start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''};
+  var h='<h1>Set up your plan</h1><p>Fill this in with your doctor.</p>'+
+  '<div class="card">'+
+  '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
+  '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
+  '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
+  '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
+  '<label class="field"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
+  '</div><div class="card" id="preview"></div>'+
+  '<h2 style="margin-top:20px">The drinks you usually have</h2><p class="muted">Add up to '+MAX_MINE+'. The app will show your daily guide in these drinks.</p>'+
+  '<div id="ed"></div>'+
+  '<div class="card" style="margin-top:14px">'+
+  '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
+  '<label class="field"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
+  '<small class="muted" id="waOut">Start with + and the country code. The app also uses this number for calls.</small></label>'+
+  '<label class="field"><span>Emergency number for an ambulance</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"></label>'+
+  '</div><div class="card">'+
+  '<h2>One question before you start</h2>'+
+  '<p>Have you ever had a fit, or seen or heard things that were not there, when you stopped or cut down drinking?</p>'+
+  '<div class="pills" id="sHist">'+['No','Yes','I am not sure'].map(function(o){return '<button type="button" aria-pressed="'+(s.history===o)+'">'+o+'</button>';}).join('')+'</div>'+
+  '<div id="histMsg"></div></div>'+
+  '<div id="setupErr" class="note hidden"></div>'+
+  '<div class="row"><button id="sGo">Start my plan</button>'+(state.editing?'<button class="ghost" id="sCancel">Cancel</button>':'')+'</div>';
+  return h;
+}
+function bindSetup(){
+  var hist=(state.settings&&state.settings.history)||'',ok=!!(state.settings&&state.settings.historyOk);
+  ed=state.myDrinks.length?clone(state.myDrinks):[{cat:'',size:0,ml:null,pct:'',name:''}];
+  bindEd($('#ed'));
+  function vals(){return {start:+$('#sStart').value,target:+$('#sTarget').value,weeks:Math.round(+$('#sWeeks').value),startDate:$('#sDate').value||today(),
+    patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok};}
+  function valid(v){
+    if(!(v.start>0))return 'Enter the units a week now.';
+    if(!(v.target>=0)||v.target>=v.start)return 'The end amount must be lower than the amount now.';
+    if(!(v.weeks>=1&&v.weeks<=12))return 'Choose between 1 and 12 weeks.';
+    return '';
+  }
+  function preview(){
+    var v=vals(),err=valid(v),el=$('#preview');
+    if(err){el.innerHTML='<p class="muted">'+esc(err)+'</p>';return;}
+    var p=buildPlan(v);
+    el.innerHTML='<h2>Your plan</h2>'+tableHTML(p,0)+'<p class="muted">The weekly amount goes down by about '+Math.round((1-Math.pow(v.target/v.start,1/v.weeks))*100)+'% each week.</p>';
+  }
+  function waOut(){
+    var n=normWa($('#sWa').value),o=$('#waOut');
+    o.textContent=!$('#sWa').value.trim()?'Start with + and the country code. The app also uses this number for calls.':
+      n.ok?'Messages and calls will go to +'+n.d+'.':n.msg;
+  }
+  function histMsg(){
+    var m=$('#histMsg');
+    if(hist==='Yes'||hist==='I am not sure'){
+      m.innerHTML='<div class="note" style="margin-top:12px"><p>'+(hist==='Yes'?'Do not cut down on your own.':'Ask your doctor before you start.')+
+      ' People who have had fits or seen things after stopping need a health team to check them before they cut down. Show this screen to your doctor.</p>'+
+      '<label class="chk"><input type="checkbox" id="sOk"'+(ok?' checked':'')+'><span>My doctor has checked this and says I can start</span></label></div>';
+      $('#sOk').onchange=function(){ok=this.checked;gate();};
+    } else m.innerHTML='';
+    gate();
+  }
+  function gate(){$('#sGo').disabled=!hist||((hist!=='No')&&!ok);}
+  ['#sStart','#sTarget','#sWeeks'].forEach(function(id){$(id).addEventListener('input',preview);});
+  $('#sWa').addEventListener('input',waOut);
+  $('#sHist').onclick=function(e){var b=e.target.closest('button');if(!b)return;hist=b.textContent;
+    Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});histMsg();};
+  $('#sGo').onclick=function(){
+    var v=vals(),wa=normWa($('#sWa').value),err=valid(v)||edValid()||(wa.ok?'':wa.msg),el=$('#setupErr');
+    if(err){el.textContent=err;el.classList.remove('hidden');return;}
+    state.settings=v;state.myDrinks=clone(ed);state.editing=false;save();tab='today';render();window.scrollTo(0,0);
+  };
+  if($('#sCancel'))$('#sCancel').onclick=function(){state.editing=false;render();};
+  preview();histMsg();waOut();
+}
+function $(s){return document.querySelector(s);}
+
+/* ---------- today ---------- */
+function overMsg(day){
+  var i=info(day),L=[];
+  L.push(who()+': alcohol plan. I went over the plan on '+niceY(day)+'.');
+  L.push('That day: '+fmt(dayTotal(day))+' units (guide '+fmt(i.daily)+' a day).');
+  if(i.phase!=='before')L.push('Week '+i.week+' so far: '+fmt(weekTotal(i.week))+' units (plan '+i.weekly+').');
+  return clip(L.join('\n'));
+}
+function overCardHTML(){
+  var o=state.overCard;
+  if(!o||!hasWa()||(o.day!==today()&&o.day!==addDays(today(),-1)))return '';
+  return '<div class="card soft"><h2>'+ic('chat')+' Tell '+esc(doc())+'</h2>'+
+    '<p>'+esc(Doc())+' asked you to send a message when you go over the plan.</p>'+
+    '<div class="row">'+waBtn(overMsg(o.day),'Send a message').replace('<a ','<a id="overSend" ')+'<button class="ghost" id="overNo">Not now</button></div>'+
+    waDelay()+'</div>';
+}
+function todayHTML(){
+  var t=today(),day=logDay==='today'?t:addDays(t,-1),i=info(t),h='';
+  h+=overCardHTML();
+  if(i.phase==='before'){
+    h+='<div class="card soft"><p>Your plan starts on <b>'+esc(niceY(state.settings.startDate))+'</b>. Until then, keep a record of what you drink. This helps '+esc(doc())+'.</p></div>';
+  } else {
+    var p=plan();
+    h+='<p class="muted">'+(i.phase==='plan'?'Week '+i.week+' of '+p.length+'. Day '+i.day+' of '+(p.length*7)+'.':'Your '+p.length+' weeks are done. Keep to '+i.weekly+' units a week, and talk to '+esc(doc())+' about what comes next.')+'</p>';
+  }
+  if(!state.storageNoted){
+    h+='<div class="note"><p>Your record stays only on this phone, in this browser. If you clear your browser data, the record is lost. Use the "For doctor" page to keep a copy before each visit.</p><button class="small ghost" id="noted">I understand</button></div>';
+  }
+  var tot=dayTotal(t),pct=Math.min(100,tot/i.daily*100||0);
+  h+='<div class="card">';
+  if(i.phase!=='before'){
+    var ph=phrases(i.daily);
+    h+='<div class="muted">Today you can have</div>'+
+      (ph.length?'<p class="allow">'+esc(cap(orList(ph)))+'.</p><p class="muted">That is '+fmt(i.daily)+' units.</p>':
+        '<p class="allow">'+fmt(i.daily)+' units</p><p class="muted">'+esc(equiv(i.daily))+'</p>');
+  }
+  h+='<div class="row spread" style="margin-top:8px"><div class="muted">So far today: <b style="color:var(--ink)">'+fmt(tot)+'</b> of '+fmt(i.daily)+' units</div></div>'+
+     '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+  if(tot>i.daily)h+='<p>This is over today\'s guide. That is okay to record. Tomorrow, go back to the guide. Do not cut down further than the plan to make up for it.</p>';
+  else if(i.phase!=='before'&&state.myDrinks.length){
+    var rem=i.daily-tot,rp=phrases(rem);
+    if(rem<=0)h+='<p>You have reached today\'s guide.</p>';
+    else if(tot>0)h+=rp.length?'<p>You can still have '+esc(orList(rp))+'.</p>':'<p>You are close to today\'s guide.</p>';
+  }
+  if(i.phase!=='before'){
+    var wt=weekTotal(Math.min(i.week,99)),wp=Math.min(100,wt/i.weekly*100||0);
+    h+='<div class="muted" style="margin-top:12px">This week: <b style="color:var(--ink)">'+fmt(wt)+'</b> of '+i.weekly+' units</div><div class="bar"><i style="width:'+wp+'%"></i></div>';
+    if(wt>i.weekly)h+='<p>This week is over the plan. Keep to the daily guide for the rest of the week. Do not try to make up for it by stopping.</p>';
+  }
+  h+='</div>';
+  if(i.phase==='plan'&&i.week<=2)h+='<div class="note">In weeks 1 and 2, do not stop suddenly. Spread a smaller amount across every day.</div>';
+  if(i.dry>0&&i.phase!=='before')h+='<div class="note">This week, choose '+plural(i.dry,'day')+' with no alcohol.</div>';
+
+  h+='<div class="card"><h2>Add a drink</h2><div class="seg" id="logDay" style="margin-bottom:12px">'+
+     '<button aria-pressed="'+(logDay==='today')+'" data-d="today">Today</button><button aria-pressed="'+(logDay==='yest')+'" data-d="yest">Yesterday</button></div>';
+  if(!state.myDrinks.length){
+    h+='<div class="note"><p>Add the drinks you usually have. Then the app can show your guide in bottles, glasses or shots.</p><button class="small" id="editMine">'+ic('add')+'Add my drinks</button></div>';
+  } else {
+    h+='<div id="mine">';
+    state.myDrinks.forEach(function(d,ix){
+      var n=dNoun(d);
+      h+='<div class="mine"><div class="head">'+ic(CATS[d.cat].icon)+'<div><b>'+esc(cap(dWhat(d)))+'</b>'+
+        '<div class="muted">'+esc(cap(n))+', '+fmt(d.ml)+'ml, '+fmt(d.pct)+'%. '+fmt(dUnits(d))+' units.</div></div></div>'+
+        '<div class="acts"><button data-mine="'+ix+'" data-f="1">'+ic('add')+'1 '+esc(n)+'</button>'+
+        '<button class="ghost" data-mine="'+ix+'" data-f="0.5">Half</button></div></div>';
+    });
+    h+='</div><button class="small ghost" id="editMine">'+ic('edit')+'Change my drinks</button>';
+  }
+  h+='<details style="margin-top:14px"><summary><b>Something not on my list</b></summary><div class="grid" id="drinkGrid" style="margin-top:10px">';
+  DRINKS.concat(state.custom).forEach(function(d,ix){
+    h+='<button class="drink" data-ix="'+ix+'">'+ic(d.icon||'local_bar')+' '+esc(d.name)+'<span>'+esc(d.detail||(d.ml+'ml at '+d.pct+'%'))+'</span><b>'+fmt(unitsOf(d.ml,d.pct))+' units</b></button>';
+  });
+  h+='</div><h3>Another drink</h3>'+
+     '<label class="field"><span>Name (you can leave this empty)</span><input type="text" id="cName"></label>'+
+     '<div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Millilitres</span><input type="number" id="cMl" min="1" inputmode="decimal"></label>'+
+     '<label class="field" style="flex:1"><span>Alcohol %</span><input type="number" id="cPct" min="0.1" max="96" step="0.1" inputmode="decimal"></label></div>'+
+     '<p id="cUnits" class="muted">The units will show here.</p>'+
+     '<button id="cAdd">'+ic('add')+'Add this drink</button></details></div>';
+
+  var list=state.drinks[day]||[];
+  h+='<div class="card"><div class="row spread"><h2 style="margin:0">'+(logDay==='today'?'Today':'Yesterday')+': '+fmt(dayTotal(day))+' units</h2>'+
+     (list.length?'<button class="small ghost" id="undo">'+ic('undo')+'Undo last</button>':'')+'</div>';
+  if(!list.length)h+='<p class="muted" style="margin-top:8px">Nothing added yet.</p>';
+  else{h+='<ul class="log">';list.forEach(function(x,ix){var tm=new Date(x.t);
+    h+='<li><span>'+esc(x.name)+' <span class="muted">'+String(tm.getHours()).padStart(2,'0')+':'+String(tm.getMinutes()).padStart(2,'0')+'</span></span><span class="row" style="flex-wrap:nowrap"><b>'+fmt(x.u)+'</b><button class="small ghost" data-del="'+ix+'" aria-label="Remove '+esc(x.name)+'">'+ic('delete')+'</button></span></li>';});
+    h+='</ul>';}
+  h+='</div>';
+  return h;
+}
+function addDrink(name,ml,pct){
+  var u=unitsOf(ml,pct);
+  if(u>=10&&!confirm('That is '+fmt(u)+' units. Add it?'))return;
+  var day=logDay==='today'?today():addDays(today(),-1),i=info(day);
+  var dB=dayTotal(day),wB=i.phase!=='before'?weekTotal(i.week):0;
+  (state.drinks[day]=state.drinks[day]||[]).push({t:Date.now(),name:name,ml:ml,pct:pct,u:r1(u)});
+  if(i.phase!=='before'&&!state.overPrompted[day]){
+    var dA=dayTotal(day),wA=weekTotal(i.week);
+    if((dB<=i.daily&&dA>i.daily)||(wB<=i.weekly&&wA>i.weekly)){
+      if(hasWa()){state.overPrompted[day]=true;state.overCard={day:day};}
+    }
+  }
+  save();render();toast('Added '+fmt(u)+' units');
+  if(state.overCard&&state.overCard.day===day)window.scrollTo(0,0);
+}
+
+/* ---------- check-in ---------- */
+var draft=null;
+function checkHTML(){
+  var t=today(),c=state.checkins[t]||{},i=info(t);
+  if(!draft)draft={sleep:c.sleep||'',craving:c.craving||'',signs:(c.signs||[]).slice(),note:c.note||''};
+  var h='<div class="card"><h2>Check-in for '+esc(nice(t))+'</h2>'+
+    '<p>Units today: <b>'+fmt(dayTotal(t))+'</b> <span class="muted">(from your record)</span></p>'+
+    '<h3>'+ic('bedtime')+' How did you sleep?</h3><div class="pills" data-f="sleep">'+SLEEP.map(function(o){return '<button aria-pressed="'+(draft.sleep===o)+'">'+o+'</button>';}).join('')+'</div>'+
+    '<h3>How strong was the urge to drink?</h3><div class="pills" data-f="craving">'+CRAVE.map(function(o){return '<button aria-pressed="'+(draft.craving===o)+'">'+o+'</button>';}).join('')+'</div>'+
+    '<h3>Did you have any of these today?</h3><div id="signs">';
+  SIGNS_DOC.concat(SIGNS_AMB).forEach(function(s){
+    h+='<label class="chk"><input type="checkbox" value="'+s.id+'"'+(draft.signs.indexOf(s.id)>=0?' checked':'')+'><span>'+esc(s.text)+'</span></label>';
+  });
+  h+='</div><label class="field" style="margin-top:12px"><span>Anything else? (you can leave this empty)</span><textarea id="cNote" rows="2">'+esc(draft.note)+'</textarea></label>'+
+    '<button id="saveCheck">'+ic('fact_check')+'Save check-in</button>'+(c.saved?' <span class="muted">Saved.</span>':'')+'</div>';
+  if(c.saved&&dayTotal(t)===0&&i.phase==='plan'&&i.week<=2)
+    h+='<div class="note">You had no alcohol today. In weeks 1 and 2, watch for the warning signs over the next two days. If any of them come, contact '+esc(doc())+'.</div>';
+  return h;
+}
+
+/* ---------- plan ---------- */
+function tableHTML(p,cur){
+  var h='<table><thead><tr><th>Week</th><th>Units a week</th><th>Guide a day</th><th>Days with no alcohol</th></tr></thead><tbody>';
+  p.forEach(function(w){h+='<tr'+(w.n===cur?' class="now"':'')+'><td>'+w.n+'</td><td>'+w.weekly+'</td><td>'+fmt(w.daily)+'</td><td>'+w.dry+'</td></tr>';});
+  return h+'</tbody></table>';
+}
+function planHTML(){
+  var s=state.settings,p=plan(),i=info(today()),h='<div class="card"><h2>Your plan</h2>';
+  h+='<p class="muted">From '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+', starting '+esc(niceY(s.startDate))+'.</p>';
+  h+=tableHTML(p,i.phase==='plan'?i.week:0);
+  if(state.myDrinks.length){
+    h+='<h3>A day, in your drinks</h3><ul class="log">';
+    p.forEach(function(w){var ph=phrases(w.daily);h+='<li><span>Week '+w.n+'</span><span style="text-align:right">'+esc(ph.length?cap(orList(ph)):fmt(w.daily)+' units')+'</span></li>';});
+    h+='</ul>';
+  }
+  if(i.phase==='plan'){
+    h+='<h3>Week '+i.week+'</h3><div class="dots">';
+    var ws=weekStart(i.week),t=today();
+    for(var d=0;d<7;d++){var k=addDays(ws,d),cls=k<t?'dot done':(k===t?'dot today':'dot');h+='<div class="'+cls+'" title="'+esc(nice(k))+'">'+DAYN[parseKey(k).getDay()].charAt(0)+'</div>';}
+    h+='</div><p class="muted">Filled circles are days that have passed.</p>';
+  }
+  h+='</div><div class="card"><h2>How to follow it</h2>'+
+    '<p>Space your drinks out through the day.</p>'+
+    '<p>In weeks 1 and 2, do not stop suddenly. A sudden stop can make you unwell, even when you drink less across the week.</p>'+
+    '<p>The weekly amount is the main limit. The daily guide helps you spread it out.</p>'+
+    '<p>If you go over one day, go back to the plan the next day.</p></div>'+
+    '<div class="card"><h2>What is a unit?</h2><p>One unit is 10ml of pure alcohol. To work it out, take the millilitres, times the alcohol %, and divide by 1000. A large bottle of beer at 5% is 3 units. A shot of spirits is about 1.4 units. A shot of strong rum at 69% is about 2.4 units.</p>'+
+    '<p class="muted">Units are a British measure. American "standard drinks" hold almost twice as much alcohol, so do not mix the two.</p></div>'+
+    '<div class="card"><h2>Ask about thiamine</h2><p>Heavy drinking uses up thiamine, also called vitamin B1. Low thiamine can damage memory. Ask '+esc(doc())+' if you should take it.</p></div>'+
+    '<button class="ghost" id="editPlan">'+ic('edit')+'Change the plan</button>';
+  return h;
+}
+
+/* ---------- progress chart ---------- */
+function progressHTML(){
+  var s=state.settings,p=plan(),i=info(today());
+  if(i.phase==='before')return '<div class="card"><h2>Progress</h2><p>Your chart will start on '+esc(niceY(s.startDate))+'.</p></div>';
+  var n=Math.max(p.length,Math.min(i.week,p.length+8));
+  var rows=[],max=+s.start;
+  for(var w=1;w<=n;w++){var pl=w<=p.length?p[w-1].weekly:p[p.length-1].weekly,ac=w<=i.week?weekTotal(w):null;rows.push({w:w,pl:pl,ac:ac,partial:w===i.week});if(ac!=null&&ac>max)max=ac;}
+  max=max*1.15;
+  var W=340,H=230,L=6,R=6,T=26,B=40,gw=(W-L-R)/n,bw=Math.min(24,gw*0.38),plotH=H-T-B;
+  function y(v){return T+plotH*(1-v/max);}
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Weekly units against your plan">';
+  svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(T+plotH)+'" y2="'+(T+plotH)+'" stroke="var(--line)" stroke-width="1"/>';
+  var lab=n<=8;
+  rows.forEach(function(r,ix){
+    var cx=L+ix*gw+gw/2,px=cx-bw-1,ax=cx+1;
+    svg+='<rect x="'+px+'" y="'+y(r.pl)+'" width="'+bw+'" height="'+(T+plotH-y(r.pl))+'" rx="3" fill="var(--p3)"/>';
+    if(lab)svg+='<text x="'+(px+bw/2)+'" y="'+(y(r.pl)-5)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+r.pl+'</text>';
+    if(r.ac!=null){
+      svg+='<rect x="'+ax+'" y="'+y(r.ac)+'" width="'+bw+'" height="'+Math.max(0,T+plotH-y(r.ac))+'" rx="3" fill="var(--p1)"/>';
+      svg+='<text x="'+(ax+bw/2)+'" y="'+(y(r.ac)-5)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--p1)">'+fmt(r.ac)+'</text>';
+    }
+    svg+='<text x="'+cx+'" y="'+(T+plotH+16)+'" text-anchor="middle" font-size="11" fill="var(--ink)">Wk '+r.w+'</text>';
+    if(r.partial)svg+='<text x="'+cx+'" y="'+(T+plotH+30)+'" text-anchor="middle" font-size="10" fill="var(--muted)">so far</text>';
+  });
+  if(rows.length){var cx0=L+gw/2;
+    svg+='<text x="'+(cx0-bw/2-1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--muted)">plan</text>';
+    svg+='<text x="'+(cx0+bw/2+1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--p1)" font-weight="700">you</text>';}
+  svg+='</svg>';
+  var h='<div class="card"><h2>Units each week</h2>'+svg+'<p class="muted">In each week, the left bar is your plan and the right bar is what you drank.</p></div><div class="card"><ul class="log">';
+  rows.forEach(function(r){if(r.ac!=null)h+='<li><span>Week '+r.w+(r.partial?' (so far)':'')+'</span><span><b>'+fmt(r.ac)+'</b> <span class="muted">plan '+r.pl+'</span></span></li>';});
+  return h+'</ul></div>';
+}
+
+/* ---------- summary ---------- */
+function recordFrom(){
+  var from=state.settings.startDate;
+  Object.keys(state.drinks).concat(Object.keys(state.checkins)).forEach(function(k){if(hasRecord(k)&&k<from)from=k;});
+  return from;
+}
+function summaryText(){
+  var s=state.settings,p=plan(),t=today(),from=recordFrom(),L=[];
+  var days=from<=t?diffDays(from,t)+1:0;
+  L.push('ALCOHOL PLAN SUMMARY');
+  if(s.patientName)L.push('Name: '+s.patientName);
+  L.push('Plan: '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+', starting '+niceY(s.startDate)+'.');
+  L.push('Weekly targets: '+p.map(function(w){return w.weekly;}).join(', ')+'.');
+  if(state.myDrinks.length)L.push('Usual drinks: '+state.myDrinks.map(function(d){return dLabel(d,1)+' ('+fmt(d.ml)+'ml at '+fmt(d.pct)+'%, '+fmt(dUnits(d))+' units)';}).join('; ')+'.');
+  if(!days){L.push('No days recorded yet.');return L.join('\n');}
+  L.push('Period: '+niceY(from)+' to '+niceY(t)+' ('+plural(days,'day')+').');
+  var rec=0,onT=0,inPlan=0,warnLines=[],dayLines=[];
+  for(var d=0;d<days;d++){
+    var k=addDays(from,d),i=info(k),c=state.checkins[k]||{},r=hasRecord(k);
+    if(r)rec++;
+    if(r&&i.phase!=='before'){inPlan++;if(dayTotal(k)<=i.daily)onT++;}
+    var signs=(c.signs||[]).map(signText);
+    if(signs.length)warnLines.push('  '+nice(k)+': '+signs.join('; '));
+    dayLines.push('  '+nice(k)+': '+(r?fmt(dayTotal(k))+' units':'no record')+
+      (c.sleep?' | sleep '+c.sleep.toLowerCase():'')+(c.craving?' | urge '+c.craving.toLowerCase():'')+
+      (signs.length?' | WARNING SIGNS':'')+(c.note?' | note: '+c.note:''));
+  }
+  L.push('Days with a record: '+rec+' of '+days+'.');
+  if(inPlan)L.push('Days at or under the daily guide: '+onT+' of '+inPlan+' recorded plan days.');
+  var ci=info(t);
+  if(ci.phase!=='before'){
+    L.push('');L.push('WEEKLY TOTALS');
+    for(var w=1;w<=ci.week;w++){var pl=w<=p.length?p[w-1].weekly:p[p.length-1].weekly;L.push('  Week '+w+(w===ci.week?' (so far)':'')+': '+fmt(weekTotal(w))+' units (plan '+pl+')');}
+  }
+  L.push('');L.push('WARNING SIGNS');
+  L.push(warnLines.length?warnLines.join('\n'):'  None ticked.');
+  L.push('');L.push('DAY BY DAY');L.push(dayLines.join('\n'));
+  return L.join('\n');
+}
+/* Short version for a chat message: totals, warning signs, then the last 7 days if there is room */
+function summaryShort(){
+  var s=state.settings,p=plan(),t=today(),ci=info(t),L=[];
+  L.push(who()+': alcohol plan summary, '+niceY(t)+'.');
+  L.push('Plan: '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+'.');
+  if(ci.phase==='before')L.push('The plan starts on '+niceY(s.startDate)+'.');
+  else for(var w=1;w<=ci.week;w++){var pl=w<=p.length?p[w-1].weekly:p[p.length-1].weekly;L.push('Week '+w+(w===ci.week?' so far':'')+': '+fmt(weekTotal(w))+' units (plan '+pl+').');}
+  var from=recordFrom(),days=from<=t?diffDays(from,t)+1:0,onT=0,inPlan=0,warn=[];
+  for(var d=0;d<days;d++){var k=addDays(from,d),i=info(k),c=state.checkins[k]||{};
+    if(hasRecord(k)&&i.phase!=='before'){inPlan++;if(dayTotal(k)<=i.daily)onT++;}
+    if((c.signs||[]).length)warn.push(nice(k)+': '+c.signs.map(signText).join('; '));}
+  if(inPlan)L.push('Days at or under the daily guide: '+onT+' of '+inPlan+'.');
+  L.push(warn.length?'Warning signs:\n- '+warn.join('\n- '):'Warning signs: none ticked.');
+  var last=[];for(var j=6;j>=0;j--){var kk=addDays(t,-j);if(kk>=from)last.push(nice(kk).slice(0,3)+' '+(hasRecord(kk)?fmt(dayTotal(kk)):'-'));}
+  var withLast=L.concat(['Last 7 days (units): '+last.join(', ')+'.']).join('\n');
+  return clip(withLast.length<=WA_MAX?withLast:L.join('\n'));
+}
+function summaryHTML(){
+  return '<div class="card"><h2>For your doctor</h2><p>Show this to '+esc(doc())+' at your visit, or send it before. It also keeps a copy of your record.</p>'+
+    (hasWa()?'<div class="noprint" style="margin-bottom:12px">'+waBtn(summaryShort(),'Send to '+doc(),'wide')+'<p class="muted" style="margin:6px 0 0">This sends a short version.</p></div>':'')+
+    '<div class="row noprint" style="margin-bottom:12px"><button class="ghost" id="copy">Copy</button>'+(navigator.share?'<button class="ghost" id="share">Send</button>':'')+'<button class="ghost" id="print">Print</button></div>'+
+    '<pre id="sumText">'+esc(summaryText())+'</pre>'+(hasWa()?'<div class="noprint">'+waDelay()+'</div>':'')+'</div>';
+}
+function copyText(txt){
+  function fallback(){var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    var ok=false;try{ok=document.execCommand('copy');}catch(e){}document.body.removeChild(ta);toast(ok?'Copied':'Could not copy. Press and hold the text to copy it.');}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(function(){toast('Copied');},fallback);}else fallback();
+}
+
+/* ---------- events ---------- */
+function bindMain(){
+  var app=document.getElementById('app');
+  var n=$('#noted');if(n)n.onclick=function(){state.storageNoted=true;save();render();};
+  var ld=$('#logDay');if(ld)ld.onclick=function(e){var b=e.target.closest('button');if(!b)return;logDay=b.dataset.d;render();};
+  var mine=$('#mine');if(mine)mine.onclick=function(e){var b=e.target.closest('button[data-mine]');if(!b)return;
+    var d=state.myDrinks[+b.dataset.mine],f=+b.dataset.f;addDrink(dLabel(d,f),d.ml*f,+d.pct);};
+  var em=$('#editMine');if(em)em.onclick=function(){ed=state.myDrinks.length?clone(state.myDrinks):[{cat:'',size:0,ml:null,pct:'',name:''}];editingDrinks=true;render();window.scrollTo(0,0);};
+  var os=$('#overSend');if(os)os.addEventListener('click',function(){state.overCard=null;save();setTimeout(render,300);});
+  var on=$('#overNo');if(on)on.onclick=function(){state.overCard=null;save();render();};
+  var g=$('#drinkGrid');if(g)g.onclick=function(e){var b=e.target.closest('button');if(!b)return;var d=DRINKS.concat(state.custom)[+b.dataset.ix];addDrink(d.name,d.ml,d.pct);};
+  var cMl=$('#cMl'),cPct=$('#cPct');
+  if(cMl){var upd=function(){var ml=+cMl.value,pc=+cPct.value;$('#cUnits').textContent=(ml>0&&pc>0)?'That is '+fmt(unitsOf(ml,pc))+' units.':'The units will show here.';};cMl.oninput=upd;cPct.oninput=upd;
+    $('#cAdd').onclick=function(){var ml=+cMl.value,pc=+cPct.value;if(!(ml>0&&pc>0&&pc<=96)){toast('Enter millilitres and alcohol %');return;}
+      var nm=$('#cName').value.trim()||(ml+'ml at '+pc+'%');
+      addDrink(nm,ml,pc);};}
+  var u=$('#undo');if(u)u.onclick=function(){var day=logDay==='today'?today():addDays(today(),-1);var l=state.drinks[day];if(l&&l.length){var x=l.pop();save();render();toast('Removed '+x.name);}};
+  Array.prototype.forEach.call(app.querySelectorAll('[data-del]'),function(b){b.onclick=function(){var day=logDay==='today'?today():addDays(today(),-1);state.drinks[day].splice(+b.dataset.del,1);save();render();};});
+  Array.prototype.forEach.call(app.querySelectorAll('.pills[data-f]'),function(el){el.onclick=function(e){var b=e.target.closest('button');if(!b)return;draft[el.dataset.f]=b.textContent;
+    Array.prototype.forEach.call(el.children,function(x){x.setAttribute('aria-pressed',x===b);});};});
+  var sg=$('#signs');if(sg)sg.onchange=function(){draft.signs=Array.prototype.map.call(sg.querySelectorAll('input:checked'),function(x){return x.value;});};
+  var cn=$('#cNote');if(cn)cn.oninput=function(){draft.note=cn.value;};
+  var sc=$('#saveCheck');if(sc)sc.onclick=function(){var t=today(),old=state.checkins[t]||{};
+    var newSign=draft.signs.some(function(x){return (old.signs||[]).indexOf(x)<0;});
+    state.checkins[t]={sleep:draft.sleep,craving:draft.craving,signs:draft.signs.slice(),note:draft.note,saved:true,cleared:newSign?false:!!old.cleared};
+    save();render();window.scrollTo(0,0);toast('Check-in saved');};
+  var ep=$('#editPlan');if(ep)ep.onclick=function(){if(confirm('Change the plan? Do this only with your doctor. Your record will be kept.')){state.editing=true;render();window.scrollTo(0,0);}};
+  var cp=$('#copy');if(cp)cp.onclick=function(){copyText(summaryText());};
+  var sh=$('#share');if(sh)sh.onclick=function(){navigator.share({title:'Alcohol plan summary',text:summaryText()}).catch(function(){});};
+  var pr=$('#print');if(pr)pr.onclick=function(){window.print();};
+}
+
+/* refresh at midnight so the day rolls over */
+var lastDay=today();
+setInterval(function(){if(today()!==lastDay){lastDay=today();draft=null;render();}},60000);
+render();
+})();
+</script>
+</body>
+</html>
