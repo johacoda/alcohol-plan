@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A week-by-week plan to cut down on alcohol safely, with a daily guide in the drinks you have. Your record stays on your phone.">
 <title>My Alcohol Plan</title>
 <style>
 :root{
@@ -147,6 +148,30 @@ svg text{font-family:inherit}
 (function(){
 'use strict';
 var KEY='myAlcoholPlan.v1';
+/* One file, two homes. On github.io it is a doctor's tool for one patient. Anywhere else
+   (pako.health) it is the public version: no doctor needed, and it can start from the
+   answers on Check your drinking, which leaves them in sessionStorage. */
+var PUBLIC=!/github\.io$/.test(location.hostname);
+var PUBLIC_TARGET=14, PUBLIC_CUT=0.2;
+var AUDIT_URL='/habit-lab/check-your-drinking/';
+var PREFILL_KEY='pako-taper-prefill';
+function weeksFor(S,T){
+  if(!(S>0)||!(T>=0)||T>=S)return '';
+  if(T===0)return 12;
+  return Math.max(1,Math.min(12,Math.ceil(Math.log(T/S)/Math.log(1-PUBLIC_CUT))));
+}
+function prefill(){
+  if(!PUBLIC)return null;
+  try{
+    var p=JSON.parse(sessionStorage.getItem(PREFILL_KEY)||'null');
+    if(!p||typeof p!=='object')return null;
+    var weekly=Math.round(+p.weekly);
+    var drinks=(Array.isArray(p.drinks)?p.drinks:[]).filter(function(d){
+      return d&&CATS[d.cat]&&+d.ml>0&&+d.pct>0&&+d.pct<=96;
+    }).slice(0,MAX_MINE).map(function(d){return {cat:d.cat,size:+d.size|0,ml:+d.ml,pct:+d.pct,name:''};});
+    return {weekly:weekly>0?weekly:'',drinks:drinks};
+  }catch(e){return null;}
+}
 /* Drink kinds for "My drinks". Strengths: beer, wine, spirits, bitters from the brief.
    Stout 7.5% = Guinness Foreign Extra Stout. Strong rum 69% = Clarke's Court Pure White and
    Rivers Royale (export bottling) in Grenada. Rivers sold at home in Grenada is often 75%. */
@@ -234,7 +259,7 @@ function diffDays(a,b){return Math.round((parseKey(b)-parseKey(a))/86400000);}
 function today(){return key(new Date());}
 function nice(k){var d=parseKey(k);return DAYN[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()];}
 function niceY(k){return nice(k)+' '+parseKey(k).getFullYear();}
-function doc(){return (state.settings&&state.settings.doctorName)?state.settings.doctorName:'your doctor';}
+function doc(){return (state.settings&&state.settings.doctorName)?state.settings.doctorName:(PUBLIC?'a doctor':'your doctor');}
 function Doc(){var d=doc();return d.charAt(0).toUpperCase()+d.slice(1);}
 function plural(n,w){return n+' '+w+(n===1?'':'s');}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
@@ -467,10 +492,15 @@ function bindDrinksScreen(){
 
 /* ---------- setup ---------- */
 function setupHTML(){
-  var s=state.settings||{start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''};
-  var h='<h1>Set up your plan</h1><p>Fill this in with your doctor.</p>'+
+  var pre=!state.settings&&prefill();
+  var s=state.settings||(PUBLIC?{start:pre?pre.weekly:'',target:PUBLIC_TARGET,weeks:pre?weeksFor(pre.weekly,PUBLIC_TARGET):'',startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''}:
+    {start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''});
+  var h=(PUBLIC?'<p class="muted"><a href="'+AUDIT_URL+'" style="color:inherit">Back to Check your drinking</a></p>':'')+
+  '<h1>Set up your plan</h1>'+
+  (pre?'<div class="note"><p style="margin:0">This is filled in from your answers on Check your drinking. Check each part before you start.</p></div>':
+    '<p>'+(PUBLIC?'Check each part. You can change any of it.':'Fill this in with your doctor.')+'</p>')+
   '<div class="card">'+
-  '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
+  '<label class="field"><span>Your name'+(PUBLIC?' (you can leave this empty)':'')+'</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
   '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
   '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
   '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
@@ -479,10 +509,12 @@ function setupHTML(){
   '<h2 style="margin-top:20px">The drinks you usually have</h2><p class="muted">Add up to '+MAX_MINE+'. The app will show your daily guide in these drinks.</p>'+
   '<div id="ed"></div>'+
   '<div class="card" style="margin-top:14px">'+
+  (PUBLIC?'<h2>Your doctor</h2><p class="muted">If you have a doctor helping you, add them here. You can leave this empty.</p>':'')+
   '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
   '<label class="field"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
   '<small class="muted" id="waOut">Start with + and the country code. The app also uses this number for calls.</small></label>'+
-  '<label class="field"><span>Emergency number for an ambulance</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"></label>'+
+  '</div><div class="card">'+
+  '<label class="field" style="margin:0"><span>Emergency number for an ambulance</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"><small class="muted">The number to call where you live. The warning page uses it.</small></label>'+
   '</div><div class="card">'+
   '<h2>One question before you start</h2>'+
   '<p>Have you ever had a fit, or seen or heard things that were not there, when you stopped or cut down drinking?</p>'+
@@ -494,7 +526,8 @@ function setupHTML(){
 }
 function bindSetup(){
   var hist=(state.settings&&state.settings.history)||'',ok=!!(state.settings&&state.settings.historyOk);
-  ed=state.myDrinks.length?clone(state.myDrinks):[{cat:'',size:0,ml:null,pct:'',name:''}];
+  var pre=!state.settings&&prefill(),weeksTouched=!!state.settings;
+  ed=state.myDrinks.length?clone(state.myDrinks):(pre&&pre.drinks.length?clone(pre.drinks):[{cat:'',size:0,ml:null,pct:'',name:''}]);
   bindEd($('#ed'));
   function vals(){return {start:+$('#sStart').value,target:+$('#sTarget').value,weeks:Math.round(+$('#sWeeks').value),startDate:$('#sDate').value||today(),
     patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok};}
@@ -502,10 +535,12 @@ function bindSetup(){
     if(!(v.start>0))return 'Enter the units a week now.';
     if(!(v.target>=0)||v.target>=v.start)return 'The end amount must be lower than the amount now.';
     if(!(v.weeks>=1&&v.weeks<=12))return 'Choose between 1 and 12 weeks.';
+    if(!v.emergency)return 'Enter the emergency number for an ambulance.';
     return '';
   }
   function preview(){
     var v=vals(),err=valid(v),el=$('#preview');
+    if(err&&!v.emergency)err=valid(Object.assign({},v,{emergency:'-'}));
     if(err){el.innerHTML='<p class="muted">'+esc(err)+'</p>';return;}
     var p=buildPlan(v);
     el.innerHTML='<h2>Your plan</h2>'+tableHTML(p,0)+'<p class="muted">The weekly amount goes down by about '+Math.round((1-Math.pow(v.target/v.start,1/v.weeks))*100)+'% each week.</p>';
@@ -527,13 +562,19 @@ function bindSetup(){
   }
   function gate(){$('#sGo').disabled=!hist||((hist!=='No')&&!ok);}
   ['#sStart','#sTarget','#sWeeks'].forEach(function(id){$(id).addEventListener('input',preview);});
+  /* For a self-starter, the number of weeks follows the amounts until they set it themselves */
+  $('#sWeeks').addEventListener('input',function(){weeksTouched=true;});
+  if(PUBLIC)['#sStart','#sTarget'].forEach(function(id){$(id).addEventListener('input',function(){
+    if(weeksTouched)return;var w=weeksFor(+$('#sStart').value,+$('#sTarget').value);$('#sWeeks').value=w;preview();});});
   $('#sWa').addEventListener('input',waOut);
   $('#sHist').onclick=function(e){var b=e.target.closest('button');if(!b)return;hist=b.textContent;
     Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});histMsg();};
   $('#sGo').onclick=function(){
     var v=vals(),wa=normWa($('#sWa').value),err=valid(v)||edValid()||(wa.ok?'':wa.msg),el=$('#setupErr');
     if(err){el.textContent=err;el.classList.remove('hidden');return;}
-    state.settings=v;state.myDrinks=clone(ed);state.editing=false;save();tab='today';render();window.scrollTo(0,0);
+    state.settings=v;state.myDrinks=clone(ed);state.editing=false;save();
+    try{sessionStorage.removeItem(PREFILL_KEY);}catch(e){}
+    tab='today';render();window.scrollTo(0,0);
   };
   if($('#sCancel'))$('#sCancel').onclick=function(){state.editing=false;render();};
   preview();histMsg();waOut();
@@ -552,7 +593,7 @@ function overCardHTML(){
   var o=state.overCard;
   if(!o||!hasWa()||(o.day!==today()&&o.day!==addDays(today(),-1)))return '';
   return '<div class="card soft"><h2>'+ic('chat')+' Tell '+esc(doc())+'</h2>'+
-    '<p>'+esc(Doc())+' asked you to send a message when you go over the plan.</p>'+
+    '<p>'+(PUBLIC?'You went over the plan. You can let '+esc(doc())+' know.':esc(Doc())+' asked you to send a message when you go over the plan.')+'</p>'+
     '<div class="row">'+waBtn(overMsg(o.day),'Send a message').replace('<a ','<a id="overSend" ')+'<button class="ghost" id="overNo">Not now</button></div>'+
     waDelay()+'</div>';
 }
