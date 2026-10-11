@@ -104,6 +104,7 @@ pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:.88r
 .toast.on{display:block}
 svg text{font-family:inherit}
 .hidden{display:none!important}
+details.card>summary{cursor:pointer}
 .terms h3{margin-top:18px}
 .terms p{font-size:.95rem}
 ul.keys{margin:0;padding-left:20px}
@@ -181,9 +182,9 @@ function prefill(){
    Rivers Royale (export bottling) in Grenada. Rivers sold at home in Grenada is often 75%. */
 var CATS={
   beer:{name:'Beer or lager',short:'beer',icon:'sports_bar',pct:5,ph:'For example: Carib',
-    sizes:[{ml:330,n:'bottle'},{ml:330,n:'can'},{ml:600,n:'large bottle'}],noun:'bottle'},
+    sizes:[{ml:330,n:'small bottle'},{ml:330,n:'can'},{ml:600,n:'large bottle'}],noun:'bottle'},
   stout:{name:'Stout',short:'stout',icon:'sports_bar',pct:7.5,ph:'For example: Guinness',
-    sizes:[{ml:330,n:'bottle'},{ml:600,n:'large bottle'}],noun:'bottle'},
+    sizes:[{ml:330,n:'small bottle'},{ml:600,n:'large bottle'}],noun:'bottle'},
   wine:{name:'Wine',short:'wine',icon:'wine_bar',pct:13,ph:'',
     sizes:[{ml:125,n:'small glass'},{ml:175,n:'glass'},{ml:750,n:'bottle'}],noun:'glass'},
   spirits:{name:'Spirits (gin, whisky, vodka, rum)',short:'spirits',icon:'liquor',pct:40,ph:'For example: gin',
@@ -325,12 +326,17 @@ function equiv(u){
 
 /* ---------- plan maths ---------- */
 function buildPlan(s){
-  var S=+s.start,T=+s.target,N=+s.weeks,r=Math.pow(T/S,1/N),out=[];
+  /* The daily guide is the week spread over all 7 days, rounded down to a half
+     unit, and it never goes up from one week to the next. Dry days are allowed
+     (up to 2, from week 3, once a day is 4 units or less) but do not raise it:
+     sharing the week over fewer days made drinking days bigger. */
+  var S=+s.start,T=+s.target,N=+s.weeks,r=Math.pow(T/S,1/N),out=[],prev=Infinity;
   for(var k=1;k<=N;k++){
     var w=(k===N)?T:Math.round(S*Math.pow(r,k));
     var dry=0;
-    if(k>=3&&w/7<=4)dry=Math.min(k-2,2);
-    out.push({n:k,weekly:w,dry:dry,daily:half(w/(7-dry))});
+    if(k>=3&&w/7<=4)dry=2;
+    var daily=Math.min(prev,Math.floor(w/7*2)/2);prev=daily;
+    out.push({n:k,weekly:w,dry:dry,daily:daily});
   }
   return out;
 }
@@ -479,6 +485,7 @@ document.getElementById('nav').addEventListener('click',function(e){var b=e.targ
 
 function render(){
   var app=document.getElementById('app'),nav=document.getElementById('nav');
+  var tool=document.getElementById('tp-units');if(tool&&tool.parentNode!==document.body){tool.hidden=true;document.body.appendChild(tool);}
   var hero=document.getElementById('tp-hero');if(hero)hero.hidden=!!state.settings&&!needTerms()&&!viewTerms&&!state.editing;
   if(needTerms()||viewTerms){nav.classList.add('hidden');app.innerHTML=termsHTML();bindTerms();return;}
   if(!state.settings||state.editing){nav.classList.add('hidden');app.innerHTML=setupHTML();bindSetup();return;}
@@ -549,11 +556,13 @@ function edValid(){
   }
   return '';
 }
-function bindEd(box){
-  function draw(){box.innerHTML=edHTML();}
+var edTouched=false;
+function bindEd(box,onChange){
+  function draw(){box.innerHTML=edHTML();if(onChange)onChange();}
   box.onclick=function(e){
     var b=e.target.closest('button');if(!b)return;
     var card=b.closest('[data-i]'),i=card?+card.dataset.i:-1,act=b.dataset.act,pills=b.closest('.pills');
+    edTouched=true;
     if(act==='add'){ed.push({cat:'',size:0,ml:null,pct:'',name:''});draw();return;}
     if(act==='del'){ed.splice(i,1);draw();return;}
     if(pills&&pills.dataset.k==='cat'){var nm=ed[i].name;ed[i]=newDrink(b.dataset.v);ed[i].name=nm;draw();return;}
@@ -565,8 +574,10 @@ function bindEd(box){
     var card=e.target.closest('[data-i]'),d=ed[+card.dataset.i];
     d[f]=f==='name'?e.target.value:(e.target.value===''?null:+e.target.value);
     card.querySelector('[data-out]').textContent=edUnitsLine(d);
+    edTouched=true;if(onChange)onChange();
   };
   draw();
+  return draw;
 }
 function drinksScreenHTML(){
   return '<h1>My drinks</h1><p>Add up to '+MAX_MINE+' drinks you usually have. The app uses them to show your daily guide.</p>'+
@@ -586,31 +597,35 @@ function setupHTML(){
   var pre=!state.settings&&prefill();
   var s=state.settings||(PUBLIC?{start:pre?pre.weekly:'',target:PUBLIC_TARGET,weeks:pre?weeksFor(pre.weekly,PUBLIC_TARGET):'',startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''}:
     {start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''});
+  var calc=PUBLIC&&!pre&&!state.settings&&!!document.getElementById('tp-units');
   var h=(PUBLIC?'<p class="muted"><a href="'+AUDIT_URL+'" style="color:inherit">Back to Check your drinking</a></p>':'')+
   '<h1>Set up your plan</h1>'+
-  (pre?'<div class="note"><p style="margin:0">This is filled in from your answers on Check your drinking. Check each part before you start.</p></div>':
-    '<p>'+(PUBLIC?'Check each part. You can change any of it.':'Fill this in with your doctor.')+'</p>')+
-  '<div class="card">'+
-  '<label class="field"><span>Your name'+(PUBLIC?' (you can leave this empty)':'')+'</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
+  (pre?'<div class="note"><p style="margin:0">Filled in from Check your drinking. Check it before you start.</p></div>':
+    PUBLIC?'':'<p>Fill this in with your doctor.</p>')+
+  (calc?'<div id="unitsSlot"></div>':'')+
+  '<div class="card" id="preview"></div>'+
+  '<details class="card"'+((!PUBLIC||!s.start)&&!calc?' open':'')+'><summary><b>Change the plan</b></summary><div style="margin-top:14px">'+
   '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
   '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
   '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
-  '<label class="field"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
-  '</div><div class="card" id="preview"></div>'+
-  '<h2 style="margin-top:20px">The drinks you usually have</h2><p class="muted">Add up to '+MAX_MINE+'. The app will show your daily guide in these drinks.</p>'+
+  '<label class="field" style="margin:0"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
+  '</div></details>'+
+  '<h2 style="margin:22px 4px 4px">Your usual drinks</h2><p class="muted" style="margin:0 4px 10px">Check the strength on the label.</p>'+
   '<div id="ed"></div>'+
   '<div class="card" style="margin-top:14px">'+
-  (PUBLIC?'<h2>Your doctor</h2><p class="muted">If you have a doctor helping you, add them here. You can leave this empty.</p>':'')+
-  '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
-  '<label class="field"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
-  '<small class="muted" id="waOut">Start with + and the country code. The app also uses this number for calls.</small></label>'+
-  '</div><div class="card">'+
-  '<label class="field" style="margin:0"><span>Emergency number for an ambulance</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"><small class="muted">The number to call where you live. The warning page uses it.</small></label>'+
-  '</div><div class="card">'+
   '<h2>One question before you start</h2>'+
   '<p>Have you ever had a fit, or seen or heard things that were not there, when you stopped or cut down drinking?</p>'+
   '<div class="pills" id="sHist">'+['No','Yes','I am not sure'].map(function(o){return '<button type="button" aria-pressed="'+(s.history===o)+'">'+o+'</button>';}).join('')+'</div>'+
   '<div id="histMsg"></div></div>'+
+  '<div class="card">'+
+  '<label class="field" style="margin:0"><span>Emergency number for an ambulance</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"><small class="muted">The number to call where you live.</small></label>'+
+  '</div>'+
+  '<details class="card"'+(PUBLIC&&!s.doctorWa&&!s.doctorName?'':' open')+'><summary><b>'+(PUBLIC?'Add your doctor (you can skip this)':'You and your doctor')+'</b></summary><div style="margin-top:14px">'+
+  '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
+  '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
+  '<label class="field" style="margin:0"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
+  '<small class="muted" id="waOut"></small></label>'+
+  '</div></details>'+
   '<div id="setupErr" class="note hidden"></div>'+
   '<div class="row"><button id="sGo">Start my plan</button>'+(state.editing?'<button class="ghost" id="sCancel">Cancel</button>':'')+'</div>';
   return h;
@@ -619,7 +634,8 @@ function bindSetup(){
   var hist=(state.settings&&state.settings.history)||'',ok=!!(state.settings&&state.settings.historyOk);
   var pre=!state.settings&&prefill(),weeksTouched=!!state.settings;
   ed=state.myDrinks.length?clone(state.myDrinks):(pre&&pre.drinks.length?clone(pre.drinks):[{cat:'',size:0,ml:null,pct:'',name:''}]);
-  bindEd($('#ed'));
+  edTouched=false;
+  var redraw=bindEd($('#ed'),function(){if($('#preview'))preview();});
   function vals(){return {start:+$('#sStart').value,target:+$('#sTarget').value,weeks:Math.round(+$('#sWeeks').value),startDate:$('#sDate').value||today(),
     patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok};}
   function valid(v){
@@ -632,13 +648,12 @@ function bindSetup(){
   function preview(){
     var v=vals(),err=valid(v),el=$('#preview');
     if(err&&!v.emergency)err=valid(Object.assign({},v,{emergency:'-'}));
-    if(err){el.innerHTML='<p class="muted">'+esc(err)+'</p>';return;}
-    var p=buildPlan(v);
-    el.innerHTML='<h2>Your plan</h2>'+tableHTML(p,0)+'<p class="muted">The weekly amount goes down by about '+Math.round((1-Math.pow(v.target/v.start,1/v.weeks))*100)+'% each week.</p>';
+    if(err){el.innerHTML='<h2>Your plan</h2><p class="muted" style="margin:0">'+esc(!v.start&&$('#unitsSlot')?'Fill in what you drink in a normal week to see your plan.':err)+'</p>';return;}
+    el.innerHTML='<h2>Your plan</h2>'+tableHTML(buildPlan(v),0,ed);
   }
   function waOut(){
     var n=normWa($('#sWa').value),o=$('#waOut');
-    o.textContent=!$('#sWa').value.trim()?'Start with + and the country code. The app also uses this number for calls.':
+    o.textContent=!$('#sWa').value.trim()?'Start with + and the country code.':
       n.ok?'Messages and calls will go to +'+n.d+'.':n.msg;
   }
   function histMsg(){
@@ -662,13 +677,42 @@ function bindSetup(){
     Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});histMsg();};
   $('#sGo').onclick=function(){
     var v=vals(),wa=normWa($('#sWa').value),err=valid(v)||edValid()||(wa.ok?'':wa.msg),el=$('#setupErr');
-    if(err){el.textContent=err;el.classList.remove('hidden');return;}
+    if(err){el.textContent=err;el.classList.remove('hidden');Array.prototype.forEach.call(document.querySelectorAll('#app details'),function(d){d.open=true;});return;}
     state.settings=v;state.myDrinks=clone(ed);state.editing=false;save();
     try{sessionStorage.removeItem(PREFILL_KEY);}catch(e){}
     tab='today';render();window.scrollTo(0,0);
   };
   if($('#sCancel'))$('#sCancel').onclick=function(){state.editing=false;render();};
+  /* First use without AUDIT: the site's units calculator fills in the week and the usual drinks. */
+  var tool=document.getElementById('tp-units'),slot=$('#unitsSlot');
+  if(tool&&slot){
+    slot.appendChild(tool);tool.hidden=false;
+    var fromCalc=function(){
+      var c=calcRead(tool);if(!(c.total>0))return;
+      $('#sStart').value=Math.round(c.total);
+      if(!weeksTouched)$('#sWeeks').value=weeksFor(Math.round(c.total),+$('#sTarget').value);
+      if(!edTouched&&c.drinks.length){ed=clone(c.drinks);redraw();}
+      preview();
+    };
+    tool.oninput=fromCalc;tool.onchange=fromCalc;tool.onclick=function(){setTimeout(fromCalc,0);};
+  }
   preview();histMsg();waOut();
+}
+/* The calculator's rows, keyed by their units, as drink kinds and sizes. Same map as audit.html. */
+var CALC_DRINKS={
+  '3':{cat:'beer',size:2,ml:600,pct:5},'1.7':{cat:'beer',size:1,ml:330,pct:5},
+  '2.3':{cat:'wine',size:1,ml:175,pct:13},'1.4':{cat:'spirits',size:0,ml:35,pct:40},
+  '8':{cat:'bitters',size:1,ml:200,pct:40},'30':{cat:'spirits',size:3,ml:750,pct:40}
+};
+function calcRead(tool){
+  var total=0,rows=[];
+  Array.prototype.forEach.call(tool.querySelectorAll('.pk-u-step[data-units]'),function(step){
+    var n=parseFloat(step.querySelector('input').value);if(!isFinite(n)||n<=0)return;
+    var u=parseFloat(step.dataset.units);total+=n*u;
+    if(CALC_DRINKS[step.dataset.units])rows.push({n:n,u:n*u,d:CALC_DRINKS[step.dataset.units]});
+  });
+  rows.sort(function(a,b){return b.n-a.n||b.u-a.u;});
+  return {total:total,drinks:rows.slice(0,MAX_MINE).map(function(r){return {cat:r.d.cat,size:r.d.size,ml:r.d.ml,pct:r.d.pct,name:''};})};
 }
 function $(s){return document.querySelector(s);}
 
@@ -723,7 +767,7 @@ function todayHTML(){
   }
   h+='</div>';
   if(i.phase==='plan'&&i.week<=2)h+='<div class="note">In weeks 1 and 2, do not stop suddenly. Spread a smaller amount across every day.</div>';
-  if(i.dry>0&&i.phase!=='before')h+='<div class="note">This week, choose '+plural(i.dry,'day')+' with no alcohol.</div>';
+  if(i.dry>0&&i.phase!=='before')h+='<div class="note">This week you can have up to '+plural(i.dry,'day')+' with no alcohol. Don\'t drink more on the other days.</div>';
 
   h+='<div class="card"><h2>Add a drink</h2><div class="seg" id="logDay" style="margin-bottom:12px">'+
      '<button aria-pressed="'+(logDay==='today')+'" data-d="today">Today</button><button aria-pressed="'+(logDay==='yest')+'" data-d="yest">Yesterday</button></div>';
@@ -798,20 +842,24 @@ function checkHTML(){
 }
 
 /* ---------- plan ---------- */
-function tableHTML(p,cur){
-  var h='<table><thead><tr><th>Week</th><th>Units a week</th><th>Guide a day</th><th>Days with no alcohol</th></tr></thead><tbody>';
-  p.forEach(function(w){h+='<tr'+(w.n===cur?' class="now"':'')+'><td>'+w.n+'</td><td>'+w.weekly+'</td><td>'+fmt(w.daily)+'</td><td>'+w.dry+'</td></tr>';});
-  return h+'</tbody></table>';
+/* One drink in the table keeps it readable; Today shows all of them. */
+function tableHTML(p,cur,drinks){
+  var d=(drinks||state.myDrinks).filter(function(x){return dUnits(x)>0;})[0];
+  var h='<table><thead><tr><th>Week</th><th>Units a week</th><th>A day</th></tr></thead><tbody>';
+  p.forEach(function(w){
+    var f=d&&fit(w.daily,d);
+    h+='<tr'+(w.n===cur?' class="now"':'')+'><td>'+w.n+'</td><td>'+w.weekly+'</td><td>'+
+      (f?esc(cap(amount(f.c,f.noun)))+' <span class="muted">'+fmt(w.daily)+' units</span>':fmt(w.daily)+' units')+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  var dw=p.filter(function(w){return w.dry>0;})[0];
+  if(dw)h+='<p class="muted" style="margin-top:8px">From week '+dw.n+', you can have up to 2 days a week with no alcohol. Don\'t drink more on the other days.</p>';
+  return h;
 }
 function planHTML(){
   var s=state.settings,p=plan(),i=info(today()),h='<div class="card"><h2>Your plan</h2>';
   h+='<p class="muted">From '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+', starting '+esc(niceY(s.startDate))+'.</p>';
   h+=tableHTML(p,i.phase==='plan'?i.week:0);
-  if(state.myDrinks.length){
-    h+='<h3>A day, in your drinks</h3><ul class="log">';
-    p.forEach(function(w){var ph=phrases(w.daily);h+='<li><span>Week '+w.n+'</span><span style="text-align:right">'+esc(ph.length?cap(orList(ph)):fmt(w.daily)+' units')+'</span></li>';});
-    h+='</ul>';
-  }
   if(i.phase==='plan'){
     h+='<h3>Week '+i.week+'</h3><div class="dots">';
     var ws=weekStart(i.week),t=today();
@@ -819,9 +867,8 @@ function planHTML(){
     h+='</div><p class="muted">Filled circles are days that have passed.</p>';
   }
   h+='</div><div class="card"><h2>How to follow it</h2>'+
-    '<p>Space your drinks out through the day.</p>'+
-    '<p>In weeks 1 and 2, do not stop suddenly. A sudden stop can make you unwell, even when you drink less across the week.</p>'+
-    '<p>The weekly amount is the main limit. The daily guide helps you spread it out.</p>'+
+    '<p>Keep to the daily amount. Don\'t save it up for one day.</p>'+
+    '<p>Don\'t stop suddenly. That can make you unwell.</p>'+
     '<p>If you go over one day, go back to the plan the next day.</p></div>'+
     '<div class="card"><h2>What is a unit?</h2><p>One unit is 10ml of pure alcohol. To work it out, take the millilitres, times the alcohol %, and divide by 1000. A large bottle of beer at 5% is 3 units. A shot of spirits is about 1.4 units. A shot of strong rum at 69% is about 2.4 units.</p>'+
     '<p class="muted">Units are a British measure. American "standard drinks" hold almost twice as much alcohol, so do not mix the two.</p></div>'+

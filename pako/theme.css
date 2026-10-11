@@ -46,6 +46,11 @@
 #app .warn h2{color:var(--t-red-ink) !important}
 #app .warn .btn{color:#FFFFFF !important}
 
+/* The units calculator, moved into setup */
+#app .pk-u-next{display:none}
+#app #unitsSlot{margin:0 0 14px}
+#app details.card>summary{font-size:17px}
+
 /* Terms */
 #app .terms h3{font-size:17px !important;margin-top:22px}
 #app .terms p{font-size:16px !important;line-height:25px !important}
