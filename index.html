@@ -457,6 +457,13 @@ var TERMS_TICKS=[
  'I am 18 or older.'
 ];
 var viewTerms=false;
+/* A record of the agreement that travels with every summary the person shares. */
+function termsLine(){
+  var t=state.terms;if(!PUBLIC||!t)return '';
+  var at=new Date(t.at),v=parseKey(t.v);
+  return 'Agreed to the Pákó Taper Plan Terms of Use and Medical Disclaimer (version of '+v.getDate()+' '+MON[v.getMonth()]+' '+v.getFullYear()+') on '+
+    niceY(key(at))+' at '+String(at.getHours()).padStart(2,'0')+':'+String(at.getMinutes()).padStart(2,'0')+'.';
+}
 function needTerms(){return PUBLIC&&!(state.terms&&state.terms.v===TERMS_V);}
 function termsDoc(){
   return '<div class="card terms"><h2>Pákó Taper Plan: Terms of Use and Medical Disclaimer</h2><p class="muted">Last updated '+TERMS_DATE+'</p>'+
@@ -946,6 +953,7 @@ function summaryText(){
   var days=from<=t?diffDays(from,t)+1:0;
   L.push('ALCOHOL PLAN SUMMARY');
   if(s.patientName)L.push('Name: '+s.patientName);
+  if(termsLine())L.push(termsLine());
   L.push('Plan: '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+', starting '+niceY(s.startDate)+'.');
   L.push('Weekly targets: '+p.map(function(w){return w.weekly;}).join(', ')+'.');
   if(state.myDrinks.length)L.push('Usual drinks: '+state.myDrinks.map(function(d){return dLabel(d,1)+' ('+fmt(d.ml)+'ml at '+fmt(d.pct)+'%, '+fmt(dUnits(d))+' units)';}).join('; ')+'.');
@@ -978,6 +986,7 @@ function summaryText(){
 function summaryShort(){
   var s=state.settings,p=plan(),t=today(),ci=info(t),L=[];
   L.push(who()+': alcohol plan summary, '+niceY(t)+'.');
+  if(termsLine())L.push(termsLine());
   L.push('Plan: '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+'.');
   if(ci.phase==='before')L.push('The plan starts on '+niceY(s.startDate)+'.');
   else for(var w=1;w<=ci.week;w++){var pl=w<=p.length?p[w-1].weekly:p[p.length-1].weekly;L.push('Week '+w+(w===ci.week?' so far':'')+': '+fmt(weekTotal(w))+' units (plan '+pl+').');}
