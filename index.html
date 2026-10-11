@@ -104,6 +104,10 @@ pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:.88r
 .toast.on{display:block}
 svg text{font-family:inherit}
 .hidden{display:none!important}
+.terms h3{margin-top:18px}
+.terms p{font-size:.95rem}
+ul.keys{margin:0;padding-left:20px}
+ul.keys li{margin:0 0 8px}
 @media print{
   nav,.warn,header,.noprint,.toast{display:none!important}
   .tab{display:none!important}
@@ -383,6 +387,91 @@ function warnMsg(){
   return clip(L.join('\n'));
 }
 
+/* ---------- terms of use (public version only) ---------- */
+/* Change TERMS_V whenever the text changes: everyone is asked to agree again. */
+var TERMS_V='2026-10-11';
+var TERMS_DATE='11 October 2026';
+var TERMS=[
+ ['1. About these terms',[
+  'These terms are an agreement between you and Pákó Health ("Pákó", "we", "us"), a Nigerian company. They cover your use of the Pákó Taper Plan (the "Tool") at pako.health/habit-lab/taper/, and any copy of it that you open, save or share.',
+  'You must agree to these terms before you use the Tool. You agree by ticking each box at the end of this page and tapping "I agree". If you do not agree with any part of these terms, do not use the Tool.',
+  'These terms sit alongside the Pákó Terms of Service and Privacy Policy at pako.health. Where they differ on the Tool, these terms apply.']],
+ ['2. The Tool is not healthcare',[
+  'The Tool is a self-help resource for education and personal record-keeping. It is not healthcare.',
+  'The Tool does not give medical advice, a diagnosis or treatment. It is not a medical device. It is not a detox, rehabilitation or withdrawal management service. It does not replace a doctor, a nurse, a pharmacist or any other qualified health worker, and it does not replace medical care of any kind.',
+  'Using the Tool does not create a doctor-patient relationship, or any other professional relationship, between you and Pákó or anyone who works with Pákó. This is true even where a doctor has written or checked the content.',
+  'Pákó does not watch, monitor or review how you use the Tool. Nobody at Pákó sees what you enter, and nobody at Pákó will contact you or act if you enter something that suggests you are unwell.']],
+ ['3. Do not use the Tool without a doctor\'s advice',[
+  'You must not use the Tool unless a doctor or other qualified health worker has advised you that it is safe for you to cut down your drinking in this way. Speak to them before you start, and keep them informed while you use the Tool.',
+  'Do not use the Tool at all, unless a doctor who knows your history has told you that you may, if any of these apply to you: you have ever had a fit (seizure), delirium tremens (the DTs), confusion, or seen or heard things that were not there, when you cut down or stopped drinking; you have shaking, sweating, nausea or a need to drink in the morning; you have been treated for alcohol withdrawal before; you are pregnant, may be pregnant or are breastfeeding; you have liver disease, heart disease, epilepsy, diabetes, or a mental health condition; you take medicines that affect the brain or interact with alcohol, such as sleeping tablets, tranquillisers, strong painkillers or medicines for fits; or you are under 18.',
+  'If you are unsure whether any of these apply to you, treat them as if they do, and speak to a doctor first.']],
+ ['4. Alcohol withdrawal can kill',[
+  'If your body has adjusted to alcohol, cutting down or stopping, even slowly, can cause withdrawal. Withdrawal can cause fits, confusion, hallucinations, heart problems and death.',
+  'If you have a fit, feel confused, see or hear things that are not there, see double, are unsteady on your feet, or feel very unwell in any way, call your local emergency number at once. Do not wait. Do not rely on the Tool.',
+  'The Tool cannot detect withdrawal and cannot tell you whether you are safe. Its warning screens are general reminders based only on what you tick. They are not monitoring, and they will not appear if you do not record your symptoms.']],
+ ['5. The plan and the numbers are estimates',[
+  'The Tool builds a plan from a general formula and from the numbers you enter. The plan is not made for you by a health worker and does not take account of your health, history, weight, medicines or other circumstances.',
+  'Units, drink sizes and alcohol strengths in the Tool are estimates. Real drinks vary, labels can be wrong, and you may enter numbers incorrectly. You are responsible for checking every number the Tool uses and shows.',
+  'Any default plan, target or drink strength in the Tool is a starting point only, and is not a recommendation that it is safe or suitable for you.']],
+ ['6. Messages and calls',[
+  'If you add a doctor\'s number, the Tool can open WhatsApp or your phone with a message or call ready for you. You decide whether to send or make it. Pákó does not send, receive, read or store these messages, and is not responsible for WhatsApp, your phone, your network or the person you contact.',
+  'There is no promise that anyone will see, read or reply to a message, or answer a call, in time or at all. Never use a message as a way to get help in an emergency. In an emergency, call your local emergency number.']],
+ ['7. Your record',[
+  'Your record is stored only in the browser on your device. Pákó does not receive it and cannot recover it. Clearing your browser data, changing device or using a different browser can lose it. You are responsible for keeping your device secure and for keeping a copy of your record if you need one.']],
+ ['8. Your responsibility',[
+  'You use the Tool entirely at your own risk. You alone are responsible for the decisions you make about your drinking and your health, including whether to use the Tool, how to use it, and whether to follow anything it shows. You agree to get medical advice before you act on anything in the Tool.']],
+ ['9. No warranties',[
+  'The Tool is provided free, "as is" and "as available". To the fullest extent the law allows, Pákó gives no promise, warranty or guarantee of any kind, express or implied, about the Tool. This includes any promise that it is accurate, complete, current, safe, suitable for you, free of errors, or always available.']],
+ ['10. Limitation of liability',[
+  'To the fullest extent the law allows, Pákó Health and its directors, staff, contractors, writers, clinical reviewers, partners and anyone else involved in making or providing the Tool will not be liable to you or to anyone else for any loss, harm, injury, illness or death, or for any damages of any kind, whether direct, indirect, incidental, special or consequential, that arise from or relate to: your use of, or inability to use, the Tool; your reliance on anything in it; any error, omission or estimate in it; any decision you make or action you take or do not take; any message or call that is not sent, seen or answered; or the loss of your record.',
+  'This applies whatever the legal basis of the claim, including contract, negligence, breach of statutory duty or any other basis, and even if Pákó was told that the loss was possible.',
+  'If any liability cannot be excluded, Pákó\'s total liability to you for all claims about the Tool is limited to ten thousand naira (₦10,000).',
+  'Nothing in these terms limits or excludes any liability that cannot by law be limited or excluded.']],
+ ['11. Indemnity',[
+  'You agree to compensate Pákó Health and the people named in section 10 for any claim, loss, cost or expense, including reasonable legal fees, that arises from your use of the Tool against these terms, or from your breach of these terms.']],
+ ['12. Changes',[
+  'Pákó may change the Tool or these terms at any time, or stop providing the Tool. When these terms change, the Tool will ask you to agree again before you can keep using it.']],
+ ['13. Law and disputes',[
+  'These terms are governed by the laws of the Federal Republic of Nigeria. The courts of Nigeria have jurisdiction over any dispute about them.',
+  'If any part of these terms is found to be invalid or unenforceable, the rest of these terms remain in force.']],
+ ['14. Contact',[
+  'Questions about these terms: hello@pako.health.']]
+];
+var TERMS_KEY=[
+ 'This tool is <b>not healthcare</b>. It\'s a self-help resource. It doesn\'t give medical advice, a diagnosis or treatment.',
+ '<b>Don\'t use it without a doctor\'s advice.</b> It doesn\'t replace a doctor or medical care.',
+ 'Cutting down can cause alcohol withdrawal, which can kill. The tool can\'t detect it. <b>In an emergency, call your local emergency number.</b>',
+ 'You use it <b>at your own risk</b>. Pákó isn\'t responsible for any harm from using it, as far as the law allows.'
+];
+var TERMS_TICKS=[
+ 'I have read and agree to the Terms of Use and Medical Disclaimer.',
+ 'I understand this tool is not healthcare. It\'s a self-help resource and doesn\'t replace a doctor or medical care.',
+ 'I won\'t use it without a doctor\'s advice. I\'ll get medical help straight away if I feel unwell.',
+ 'I am 18 or older.'
+];
+var viewTerms=false;
+function needTerms(){return PUBLIC&&!(state.terms&&state.terms.v===TERMS_V);}
+function termsDoc(){
+  return '<div class="card terms"><h2>Pákó Taper Plan: Terms of Use and Medical Disclaimer</h2><p class="muted">Last updated '+TERMS_DATE+'</p>'+
+    TERMS.map(function(s){return '<h3>'+esc(s[0])+'</h3>'+s[1].map(function(p){return '<p>'+esc(p)+'</p>';}).join('');}).join('')+'</div>';
+}
+function termsHTML(){
+  if(viewTerms)return '<button class="ghost small" id="tBack" style="margin-bottom:12px">Back</button>'+termsDoc()+
+    (state.terms?'<p class="muted">You agreed to these terms on '+esc(niceY(state.terms.at.slice(0,10)))+'.</p>':'');
+  return '<p class="muted"><a href="'+AUDIT_URL+'" style="color:inherit">Back to Check your drinking</a></p>'+
+    '<h1>Before you start</h1><p>Read and agree to these terms to use the taper plan.</p>'+
+    '<div class="card soft"><h2>The main points</h2><ul class="keys">'+TERMS_KEY.map(function(k){return '<li>'+k+'</li>';}).join('')+'</ul></div>'+
+    termsDoc()+
+    '<div class="card" id="tTicks">'+TERMS_TICKS.map(function(t,i){return '<label class="chk"><input type="checkbox" data-t="'+i+'"><span>'+esc(t)+'</span></label>';}).join('')+'</div>'+
+    '<div class="row"><button id="tAgree" disabled>I agree</button><a class="btn ghost" href="'+AUDIT_URL+'">I don\'t agree</a></div>';
+}
+function bindTerms(){
+  var b=$('#tBack');if(b)b.onclick=function(){viewTerms=false;render();window.scrollTo(0,0);};
+  var box=$('#tTicks');if(!box)return;
+  box.onchange=function(){$('#tAgree').disabled=box.querySelectorAll('input:checked').length<TERMS_TICKS.length;};
+  $('#tAgree').onclick=function(){state.terms={v:TERMS_V,at:new Date().toISOString()};save();render();window.scrollTo(0,0);};
+}
+
 /* ---------- routing ---------- */
 var tab='today', logDay='today', editingDrinks=false;
 function go(t){tab=t;render();window.scrollTo(0,0);}
@@ -390,6 +479,7 @@ document.getElementById('nav').addEventListener('click',function(e){var b=e.targ
 
 function render(){
   var app=document.getElementById('app'),nav=document.getElementById('nav');
+  if(needTerms()||viewTerms){nav.classList.add('hidden');app.innerHTML=termsHTML();bindTerms();return;}
   if(!state.settings||state.editing){nav.classList.add('hidden');app.innerHTML=setupHTML();bindSetup();return;}
   var lvl=warnLevel();
   if(lvl){
@@ -735,7 +825,7 @@ function planHTML(){
     '<div class="card"><h2>What is a unit?</h2><p>One unit is 10ml of pure alcohol. To work it out, take the millilitres, times the alcohol %, and divide by 1000. A large bottle of beer at 5% is 3 units. A shot of spirits is about 1.4 units. A shot of strong rum at 69% is about 2.4 units.</p>'+
     '<p class="muted">Units are a British measure. American "standard drinks" hold almost twice as much alcohol, so do not mix the two.</p></div>'+
     '<div class="card"><h2>Ask about thiamine</h2><p>Heavy drinking uses up thiamine, also called vitamin B1. Low thiamine can damage memory. Ask '+esc(doc())+' if you should take it.</p></div>'+
-    '<button class="ghost" id="editPlan">'+ic('edit')+'Change the plan</button>';
+    '<div class="row"><button class="ghost" id="editPlan">'+ic('edit')+'Change the plan</button>'+(PUBLIC?'<button class="ghost" id="viewTerms">'+ic('description')+'Terms of use</button>':'')+'</div>';
   return h;
 }
 
@@ -867,6 +957,7 @@ function bindMain(){
     state.checkins[t]={sleep:draft.sleep,craving:draft.craving,signs:draft.signs.slice(),note:draft.note,saved:true,cleared:newSign?false:!!old.cleared};
     save();render();window.scrollTo(0,0);toast('Check-in saved');};
   var ep=$('#editPlan');if(ep)ep.onclick=function(){if(confirm('Change the plan? Do this only with your doctor. Your record will be kept.')){state.editing=true;render();window.scrollTo(0,0);}};
+  var vt=$('#viewTerms');if(vt)vt.onclick=function(){viewTerms=true;render();window.scrollTo(0,0);};
   var cp=$('#copy');if(cp)cp.onclick=function(){copyText(summaryText());};
   var sh=$('#share');if(sh)sh.onclick=function(){navigator.share({title:'Alcohol plan summary',text:summaryText()}).catch(function(){});};
   var pr=$('#print');if(pr)pr.onclick=function(){window.print();};
