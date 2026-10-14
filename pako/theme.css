@@ -9,11 +9,11 @@
 }
 .tp-hero[hidden]{display:none}
 .tp-hero h1{margin:0 0 12px}
-#app{max-width:760px;margin:20px auto 0;padding:0 0 120px;font-family:'Noto Sans',sans-serif}
+#app{max-width:760px;margin:20px auto 0;padding:0 0 calc(var(--s-11) * 2);font-family:'Noto Sans',sans-serif}
 #app h1,#app h2,#app h3{font-family:'Hanken Grotesk',sans-serif !important;color:var(--t-ink) !important;letter-spacing:-0.2px !important}
 #app h1{font-size:32px !important;line-height:38px !important;font-weight:500 !important;margin:8px 4px 16px}
 #app h2{font-size:22px !important;line-height:28px !important;font-weight:600 !important;margin:0 0 10px}
-#app h3{font-size:17px !important;line-height:24px !important;font-weight:600 !important;margin:18px 0 8px}
+#app h3{font-size:17px !important;line-height:24px !important;font-weight:600 !important;margin:var(--s-5) 0 var(--s-2)}
 #app h2 .ic,#app h3 .ic{color:var(--t-p1)}
 #app p,#app li{font-size:17px !important;line-height:26px !important;max-width:none}
 #app p.muted,#app .muted,#app small.muted{font-size:15px !important;line-height:22px !important;color:var(--t-muted) !important}
@@ -26,12 +26,16 @@
 /* Cards: white on the grey ground, 20px radius, no border, as on the other lab tools */
 #app .card{border:0;border-radius:20px;padding:24px}
 #app .card.soft{background:var(--t-ptint)}
-#app .note{background:var(--t-ptint);border-radius:12px;padding:14px 18px}
+#app .note{background:var(--t-ptint);border-radius:12px;padding:var(--s-mid) var(--s-5)}
 #app .mine{background:var(--t-surface);border-radius:12px;padding:16px}
 #app .drink{border-radius:12px}
 
 /* Buttons: purple, 8px, like the site's controls. Red stays for the warning panel. */
-#app button,#app .btn{border-radius:8px;font-family:'Noto Sans',sans-serif !important;font-weight:600;min-height:48px;font-size:16px}
+/* Pills, like every other button on the site. This was 8px, so the taper's
+   buttons were the only square-cornered ones in the lab. The tab bar and
+   the segmented control keep their own shapes. */
+#app button,#app .btn{border-radius:var(--r-pill);font-family:'Noto Sans',sans-serif !important;font-weight:600;min-height:48px;font-size:16px}
+#app .tabbar button{border-radius:0}
 #app button.small{min-height:40px;font-size:15px}
 #app .pills button,#app .seg button{min-height:44px}
 #app .pills button{border-radius:9999px;border:1px solid var(--t-line);background:var(--t-card)}
@@ -45,6 +49,12 @@
 #app .warn{border:0;border-radius:20px;background:var(--t-red-tint);padding:24px}
 #app .warn h2{color:var(--t-red-ink) !important}
 #app .warn .btn{color:#FFFFFF !important}
+/* The WhatsApp buttons are anchors, and something in miro.css was turning
+   their label purple on a purple fill — "Send a message" rendered as a
+   blank pill. The .warn case was patched on its own once; this covers the
+   rest of them. */
+#app .btn{color:var(--t-on-p1) !important}
+#app .btn.ghost{color:var(--t-p1) !important;background:transparent}
 
 /* The units calculator, moved into setup */
 #app .pk-u-next{display:none}
@@ -52,7 +62,7 @@
 #app details.card>summary{font-size:17px}
 
 /* Terms */
-#app .terms h3{font-size:17px !important;margin-top:22px}
+#app .terms h3{font-size:17px !important;margin-top:var(--s-6)}
 #app .terms p{font-size:16px !important;line-height:25px !important}
 
 /* Bottom tab bar */
@@ -68,3 +78,22 @@
   #app .card,#app .warn{padding:20px}
   #app h1{font-size:28px !important;line-height:34px !important}
 }
+
+/* Setup's stepper. The bar and the nav match the sleep app, the habit map
+   and AUDIT; only the tokens differ, because this app carries its own. */
+#app .tp-step[hidden]{display:none}
+#app .tp-step>h2{margin:0 0 var(--s-2)}
+#app .tp-step-sub{margin:0 0 var(--s-5) !important}
+#app .tp-prog{margin:0 0 var(--s-7)}
+#app .tp-prog-bar{height:6px;border-radius:9999px;background:var(--t-ptint);overflow:hidden}
+#app .tp-prog-bar span{background:var(--t-p1)}
+#app .tp-prog-count{margin:var(--s-snug) 0 0 !important}
+#app .tp-nav{display:flex;align-items:center;gap:var(--s-4);margin-top:var(--s-7);flex-wrap:wrap}
+#app .tp-nav [hidden]{display:none !important}
+#app .tp-nav button{min-height:48px}
+
+/* A refusal, not a warning: the red tint says this one is different from
+   the ordinary notes on the page. */
+#app .note-stop{background:var(--t-red-tint);border-left:0}
+#app .note-stop button{margin-top:var(--s-3)}
+#app .tp-q{font-weight:600;margin:0 0 var(--s-3)}

@@ -29,7 +29,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--t-bg);color:var(--t-ink);font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.5}
-.wrap{max-width:560px;margin:0 auto;padding:16px 16px 112px}
+.wrap{max-width:560px;margin:0 auto;padding:var(--s-4,16px) var(--s-4,16px) calc(var(--s-11,64px) + var(--s-10,48px))}
 h1,h2,h3{font-family:"Hanken Grotesk","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 h1{font-size:1.35rem;margin:4px 0 12px;line-height:1.25}
 h2{font-size:1.15rem;margin:0 0 8px;line-height:1.3}
@@ -41,12 +41,17 @@ p{margin:0 0 10px}
 .big{font-size:2.6rem;font-weight:800;line-height:1;color:var(--t-p1)}
 .big small{font-size:1rem;font-weight:600;color:var(--t-muted)}
 .allow{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--t-p1);margin:2px 0 4px}
-.bar{height:12px;background:var(--t-surface);border-radius:6px;overflow:hidden;margin:8px 0 6px}
+.bar{height:12px;background:var(--t-surface);border-radius:6px;overflow:hidden;margin:var(--s-2,8px) 0 var(--s-tight,6px)}
 .bar>i{display:block;height:100%;background:var(--t-p1);border-radius:6px}
+/* A full purple bar reads as a goal met. Reaching your drinking guide is
+   not an achievement, and going past it is not a failure to punish, so the
+   two states are stated plainly rather than coloured in. */
+.bar.is-done>i{background:var(--t-p3)}
+.bar.is-over>i{background:var(--t-red)}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .spread{justify-content:space-between}
 .ic{width:1.3em;height:1.3em;fill:currentColor;flex:none;vertical-align:-.28em}
-button,.btn{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--t-p1);background:var(--t-p1);color:var(--t-on-p1);padding:11px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+button,.btn{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--t-p1);background:var(--t-p1);color:var(--t-on-p1);padding:var(--s-3,12px) var(--s-4,16px);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
 button.ghost,.btn.ghost{background:transparent;color:var(--t-p1)}
 button.small{padding:6px 10px;font-size:.9rem}
 button:disabled{opacity:.45;cursor:not-allowed}
@@ -61,7 +66,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .mine .head .ic{color:var(--t-p1);width:1.6em;height:1.6em}
 .mine .acts{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:10px}
 .mine .acts button{padding:10px 8px}
-.seg{display:flex;background:var(--t-surface);border-radius:10px;padding:3px;gap:3px}
+.seg{display:flex;background:var(--t-surface);border-radius:10px;padding:var(--s-1,4px);gap:var(--s-1,4px)}
 .seg button{flex:1;background:transparent;border:none;color:var(--t-ink);padding:8px;font-weight:600}
 .seg button[aria-pressed="true"]{background:var(--t-card);color:var(--t-p1);box-shadow:0 1px 2px rgba(0,0,0,.15)}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
@@ -87,7 +92,7 @@ tr.now td{background:var(--t-ptint);font-weight:700}
 .dot.done{background:var(--t-p1);border-color:var(--t-p1);color:var(--t-on-p1)}
 .dot.today{border-color:var(--t-p1);border-width:3px;color:var(--t-p1);font-weight:800}
 .note{padding:10px 12px;background:var(--t-ptint);border-radius:10px;margin:0 0 12px}
-.warn{border:2px solid var(--t-red);background:var(--t-red-tint);border-radius:14px;padding:16px;margin:18px 0 14px}
+.warn{border:2px solid var(--t-red);background:var(--t-red-tint);border-radius:14px;padding:16px;margin:var(--s-5,20px) 0 var(--s-mid,14px)}
 .warn h2{color:var(--t-red-ink);display:flex;gap:6px;align-items:center}
 .warn h3{margin-top:12px}
 .warn ul{margin:4px 0 10px;padding-left:20px}
@@ -106,7 +111,7 @@ pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:.88r
 svg text{font-family:inherit}
 .hidden{display:none!important}
 details.card>summary{cursor:pointer}
-.terms h3{margin-top:18px}
+.terms h3{margin-top:var(--s-5,20px)}
 .terms p{font-size:.95rem}
 ul.keys{margin:0;padding-left:20px}
 ul.keys li{margin:0 0 8px}
@@ -116,6 +121,94 @@ ul.keys li{margin:0 0 8px}
   #tab-summary{display:block!important}
   body{background:#fff;color:#000}
   pre{background:#fff;font-size:11pt}
+}
+
+/* ===== Setup, one screen at a time ===================================
+   Spacing comes from the Pákó scale (--s-*). The fallbacks are for the
+   patient copy on github.io, which does not load miro.css. */
+.tp-step[hidden]{display:none}
+.tp-step-sub{margin:0 0 var(--s-4,16px)}
+.tp-prog{margin:0 0 var(--s-7,28px)}
+.tp-prog-bar{height:6px;border-radius:9999px;background:var(--t-ptint);overflow:hidden}
+.tp-prog-bar span{display:block;height:100%;width:0;border-radius:9999px;background:var(--t-p1);transition:width 350ms ease}
+.tp-prog-count{margin:var(--s-snug,10px) 0 0}
+.tp-nav{display:flex;align-items:center;gap:var(--s-4,16px);margin-top:var(--s-7,28px);flex-wrap:wrap}
+.tp-nav [hidden]{display:none !important}
+@media (prefers-reduced-motion: reduce){.tp-prog-bar span{transition:none}}
+
+/* ===== Today: a vessel and a dial ===================================
+   Both are buttons. Hover, focus or tap one and the line underneath says
+   what it means; it is filled in on load so a touch screen loses nothing. */
+/* Two cards, side by side: the week and today. Each is a figure with its
+   words beside it. */
+.tp-grid{display:grid;gap:var(--s-3,12px);grid-template-columns:1fr 1fr;align-items:stretch}
+.tp-tile{
+  background:var(--t-card);border-radius:var(--r-card,20px);padding:var(--s-5,20px);
+  display:flex;align-items:center;gap:var(--s-5,20px);min-width:0;
+}
+.tp-tile>.tp-vessel,.tp-tile>.tp-dial{flex:none}
+.tp-tile-words{min-width:0;display:flex;flex-direction:column;gap:var(--s-2,8px)}
+.tp-tile-note{margin:0;color:var(--t-muted)}
+.tp-tile-hero{margin:0;font-weight:600;color:var(--t-ink)}
+
+/* The day's line is in the flow from the start and only fades, so hovering
+   never pushes the card taller. Below 900px there is no hover to wait for. */
+@media (min-width:901px){
+  .tp-reveal{opacity:0;transition:opacity 180ms ease}
+  .tp-tile-day:hover .tp-reveal,.tp-tile-day:focus-within .tp-reveal{opacity:1}
+}
+@media (prefers-reduced-motion: reduce){.tp-reveal{transition:none}}
+@media (max-width:620px){.tp-grid{grid-template-columns:1fr}}
+.tp-vessel,.tp-dial{
+  background:none;border:0;padding:var(--s-2,8px);margin:0;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:var(--s-1,4px);
+  border-radius:var(--r-panel,12px);min-height:0;
+}
+.tp-vessel svg{width:96px;height:auto;display:block}
+.tp-dial svg{width:112px;height:auto;display:block}
+/* No hover plate. The figures already answer by brightening, and a grey
+   disc behind a bottle just looks like a smudge. */
+.tp-vessel:focus-visible,.tp-dial:focus-visible{outline:2px solid var(--t-p1);outline-offset:2px}
+
+.tp-v-body{fill:var(--t-surface)}
+.tp-v-line{stroke:var(--t-p3)}
+.tp-v-cap{fill:var(--t-p3)}
+.tp-v-fill{fill:var(--t-p2)}
+/* The bloom from the Pause dashboard. Each figure carries its own, in
+   whatever colour it is currently showing, so the state reads before the
+   number does. */
+.tp-vessel{--glow:rgba(115,107,135,.55)}
+.tp-dial{--glow:rgba(60,49,88,.42)}
+.tp-vessel.is-done,.tp-vessel.is-over,.tp-dial.is-over{--glow:rgba(192,57,43,.38)}
+.tp-dial.is-done{--glow:rgba(204,201,212,.6)}
+.tp-v-fill,.tp-dial-arc{filter:drop-shadow(0 0 9px var(--glow))}
+.tp-vessel.is-over .tp-v-line{filter:drop-shadow(0 0 9px var(--glow))}
+@media (prefers-reduced-motion: no-preference){
+  .tp-v-fill,.tp-dial-arc{transition:filter 300ms ease}
+}
+.tp-vessel.is-done .tp-v-fill,.tp-vessel.is-over .tp-v-fill{fill:var(--t-red)}
+/* Past the guide there is no liquid left to colour, so an empty outline
+   looked the same as a day gone exactly to plan. The vessel itself carries
+   the state instead. */
+.tp-vessel.is-over .tp-v-body{fill:var(--t-red-tint)}
+.tp-vessel.is-over .tp-v-line,.tp-vessel.is-over .tp-v-cap{stroke:var(--t-red);fill:var(--t-red)}
+.tp-vessel.is-over .tp-v-line{fill:none}
+.tp-vessel.is-over .tp-dial-big{color:var(--t-red-ink)}
+
+.tp-dial-track{stroke:var(--t-surface)}
+.tp-dial-arc{stroke:var(--t-p1)}
+.tp-dial.is-done .tp-dial-arc{stroke:var(--t-p3)}
+.tp-dial.is-over .tp-dial-arc{stroke:var(--t-red)}
+.tp-dial-num{font-weight:700;font-size:26px;fill:var(--t-ink)}
+.tp-dial-of{font-size:13px;fill:var(--t-muted)}
+
+.tp-dial-big{font-weight:700;color:var(--t-ink);font-size:1.05rem}
+.tp-dial-label{color:var(--t-muted);font-size:.92rem}
+.tp-dial-note{margin:var(--s-3,12px) 0 0;min-height:3em}
+@media (max-width:420px){
+  .tp-dials{gap:var(--s-3,12px)}
+  .tp-vessel svg{width:78px}
+  .tp-dial svg{width:92px}
 }
 </style>
 </head>
@@ -160,6 +253,9 @@ var KEY='myAlcoholPlan.v1';
 var PUBLIC=!/github\.io$/.test(location.hostname);
 var PUBLIC_TARGET=14, PUBLIC_CUT=0.2;
 var AUDIT_URL='/habit-lab/check-your-drinking/';
+/* Where "I don't agree" goes. On pako.health that is the lab the card came
+   from, not the screening test most of these readers never took. */
+var EXIT_URL=PUBLIC?'/habit-lab':AUDIT_URL;
 var PREFILL_KEY='pako-taper-prefill';
 function weeksFor(S,T){
   if(!(S>0)||!(T>=0)||T>=S)return '';
@@ -343,7 +439,11 @@ function buildPlan(s){
 }
 function plan(){return buildPlan(state.settings);}
 function info(k){
-  var s=state.settings,p=plan(),d=diffDays(s.startDate,k);
+  var s=state.settings;
+  /* No plan was given, on safety grounds. buildPlan would divide by a
+     zero-week taper, so it is never called. */
+  if(s.diary)return {phase:'diary',week:0,weekly:0,daily:0,dry:0,day:diffDays(s.startDate,k)+1};
+  var p=plan(),d=diffDays(s.startDate,k);
   if(d<0)return {phase:'before',daysTo:-d,week:0,weekly:+s.start,daily:half(s.start/7),dry:0};
   var wk=Math.floor(d/7)+1;
   if(wk>p.length){var L=p[p.length-1];return {phase:'after',week:wk,weekly:L.weekly,daily:L.daily,dry:L.dry,day:d+1};}
@@ -472,12 +572,14 @@ function termsDoc(){
 function termsHTML(){
   if(viewTerms)return '<button class="ghost small" id="tBack" style="margin-bottom:12px">Back</button>'+termsDoc()+
     (state.terms?'<p class="muted">You agreed to these terms on '+esc(niceY(state.terms.at.slice(0,10)))+'.</p>':'');
-  return '<p class="muted"><a href="'+AUDIT_URL+'" style="color:inherit">Back to Check your drinking</a></p>'+
-    '<h1>Before you start</h1><p>Read and agree to these terms to use the taper plan.</p>'+
+  /* No "back to Check your drinking" here. Most people reach this from the
+     Habit Lab card, having never taken AUDIT, and it offered them a way
+     back to somewhere they had not been. */
+  return '<h1>Before you start</h1><p>Read and agree to these terms before you start.</p>'+
     '<div class="card soft"><h2>The main points</h2><ul class="keys">'+TERMS_KEY.map(function(k){return '<li>'+k+'</li>';}).join('')+'</ul></div>'+
     termsDoc()+
     '<div class="card" id="tTicks">'+TERMS_TICKS.map(function(t,i){return '<label class="chk"><input type="checkbox" data-t="'+i+'"><span>'+esc(t)+'</span></label>';}).join('')+'</div>'+
-    '<div class="row"><button id="tAgree" disabled>I agree</button><a class="btn ghost" href="'+AUDIT_URL+'">I don\'t agree</a></div>';
+    '<div class="row"><button id="tAgree" disabled>I agree</button><a class="btn ghost" href="'+EXIT_URL+'">I don\'t agree</a></div>';
 }
 function bindTerms(){
   var b=$('#tBack');if(b)b.onclick=function(){viewTerms=false;render();window.scrollTo(0,0);};
@@ -536,6 +638,13 @@ function render(){
     return;
   }
   if(editingDrinks){nav.classList.add('hidden');app.innerHTML=drinksScreenHTML();bindDrinksScreen();return;}
+  /* No plan was given, so there is no plan to show and no taper to chart. */
+  var diary=!!(state.settings&&state.settings.diary);
+  Array.prototype.forEach.call(nav.querySelectorAll('button[data-tab]'),function(b){
+    var off=diary&&(b.dataset.tab==='plan'||b.dataset.tab==='progress');
+    b.hidden=off;
+    if(off&&tab===b.dataset.tab)tab='today';
+  });
   nav.classList.remove('hidden');
   Array.prototype.forEach.call(nav.querySelectorAll('button'),function(b){b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');});
   var html='<header><h1>My alcohol plan</h1></header>';
@@ -630,46 +739,82 @@ function setupHTML(){
   var s=state.settings||(PUBLIC?{start:pre?pre.weekly:'',target:PUBLIC_TARGET,weeks:pre?weeksFor(pre.weekly,PUBLIC_TARGET):'',startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''}:
     {start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''});
   var calc=PUBLIC&&!pre&&!state.settings&&!!document.getElementById('tp-units');
-  var h=(PUBLIC?'<p class="muted"><a href="'+AUDIT_URL+'" style="color:inherit">Back to Check your drinking</a></p>':'')+
-  '<h1>Set up your plan</h1><div id="instSlot"></div>'+
-  (pre?'<div class="note"><p style="margin:0">Filled in from Check your drinking. Check it before you start.</p></div>':
-    PUBLIC?'':'<p>Fill this in with your doctor.</p>')+
-  (calc?'<div id="unitsSlot"></div>':'')+
-  '<div class="card" id="preview"></div>'+
-  '<details class="card"'+((!PUBLIC||!s.start)&&!calc?' open':'')+'><summary><b>Change the plan</b></summary><div style="margin-top:14px">'+
-  '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
-  '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
-  '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
-  '<label class="field" style="margin:0"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
-  '</div></details>'+
-  '<h2 style="margin:22px 4px 4px">Your usual drinks</h2><p class="muted" style="margin:0 4px 10px">Check the strength on the label.</p>'+
-  '<div id="ed"></div>'+
-  '<div class="card" style="margin-top:14px">'+
-  '<h2>One question before you start</h2>'+
-  '<p>Have you ever had a fit, or seen or heard things that were not there, when you stopped or cut down drinking?</p>'+
-  '<div class="pills" id="sHist">'+['No','Yes','I am not sure'].map(function(o){return '<button type="button" aria-pressed="'+(s.history===o)+'">'+o+'</button>';}).join('')+'</div>'+
-  '<div id="histMsg"></div></div>'+
-  '<div class="card">'+
-  '<label class="field" style="margin:0"><span>Emergency number for an ambulance</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"><small class="muted">The number to call where you live.</small></label>'+
-  '</div>'+
-  '<details class="card"'+(PUBLIC&&!s.doctorWa&&!s.doctorName?'':' open')+'><summary><b>'+(PUBLIC?'Add your doctor (you can skip this)':'You and your doctor')+'</b></summary><div style="margin-top:14px">'+
-  '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
-  '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
-  '<label class="field" style="margin:0"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
-  '<small class="muted" id="waOut"></small></label>'+
-  '</div></details>'+
+
+  /* One thing on screen at a time, the same as the other Habit Lab apps.
+     Setup used to be the whole worksheet at once: the numbers, the drinks,
+     the safety question, the emergency number and the doctor, all before
+     you could start. Every id below is unchanged, so bindSetup still finds
+     what it binds to. */
+  /* Screens are collected, then numbered. The calculator only exists on a
+     first run in the browser; when it is absent its screen used to stay in
+     the list saying "nothing to add up here, move on", which is a step that
+     exists to be clicked past. Now it is simply not built, and the count
+     reads 5 instead of 6. */
+  var screens=[];
+  function step(head,sub,body){ screens.push({head:head,sub:sub,body:body}); }
+  function steps(){
+    return screens.map(function(x,i){
+      return '<section class="tp-step" data-step="'+(i+1)+'" hidden>'+
+        '<h2>'+x.head+'</h2>'+(x.sub?'<p class="muted tp-step-sub">'+x.sub+'</p>':'')+x.body+'</section>';
+    }).join('');
+  }
+
+  if(calc)step('What you drink in a normal week',
+    'Add up a normal week. You can change it later.',
+    '<div id="unitsSlot"></div>');
+
+  step('Your usual drinks','Check the strength on the label.','<div id="ed"></div>');
+
+  step('Before you start','Two questions. They decide whether cutting down on your own is safe for you.',
+    '<p class="tp-q">Have you ever had a fit, or seen or heard things that were not there, when you stopped or cut down drinking?</p>'+
+    '<div class="pills" id="sHist">'+['No','Yes','I am not sure'].map(function(o){return '<button type="button" aria-pressed="'+(s.history===o)+'">'+o+'</button>';}).join('')+'</div>'+
+    '<div id="histMsg"></div>'+
+    /* Morning drinking is the everyday sign that the body has adjusted.
+       AUDIT asks it, but most people reach this page from the Habit Lab
+       card and never take AUDIT, so it is asked here too. */
+    '<p class="tp-q" style="margin-top:20px">Do you need a drink in the morning to get going, or wake up shaky or sick?</p>'+
+    '<div class="pills" id="sMorn">'+['No','Yes'].map(function(o){return '<button type="button" aria-pressed="'+(s.morning===o)+'">'+o+'</button>';}).join('')+'</div>'+
+    '<div id="mornMsg"></div>');
+
+  step('Emergency number','The number you\'d call for an ambulance where you live.',
+    '<label class="field" style="margin:0"><span>Emergency number</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"></label>');
+
+  step(PUBLIC?'Your doctor':'You and your doctor',PUBLIC?'You can skip this.':'',
+    '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
+    '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
+    '<label class="field" style="margin:0"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
+    '<small class="muted" id="waOut"></small></label>');
+
+  step('Your plan','Change these and the plan below changes with them.',
+    '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
+    '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
+    '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
+    '<label class="field"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
+    '<div id="preview"></div>');
+
+  var h='<h1>Set up your plan</h1><div id="instSlot"></div>'+
+  '<div class="tp-prog" id="tpProg"><div class="tp-prog-bar"><span id="tpProgFill"></span></div>'+
+  '<p class="tp-prog-count muted" id="tpProgCount">&nbsp;</p></div>'+
+  (pre?'<div class="note"><p style="margin:0">Filled in from Check your drinking. Check it before you start.</p></div>':'')+
+  steps()+
   '<div id="setupErr" class="note hidden"></div>'+
-  '<div class="row"><button id="sGo">Start my plan</button>'+(state.editing?'<button class="ghost" id="sCancel">Cancel</button>':'')+'</div>';
+  '<div class="tp-nav" id="tpNav">'+
+    '<button type="button" class="ghost" id="tpBack" hidden>Back</button>'+
+    '<button type="button" id="tpNext">Next</button>'+
+    '<button type="button" id="sGo" hidden>Start my plan</button>'+
+    (state.editing?'<button class="ghost" id="sCancel">Cancel</button>':'')+
+  '</div>';
   return h;
 }
 function bindSetup(){
   var hist=(state.settings&&state.settings.history)||'',ok=!!(state.settings&&state.settings.historyOk);
+  var morn=(state.settings&&state.settings.morning)||'';
   var pre=!state.settings&&prefill(),weeksTouched=!!state.settings;
   ed=state.myDrinks.length?clone(state.myDrinks):(pre&&pre.drinks.length?clone(pre.drinks):[{cat:'',size:0,ml:null,pct:'',name:''}]);
   edTouched=false;
   var redraw=bindEd($('#ed'),function(){if($('#preview'))preview();});
   function vals(){return {start:+$('#sStart').value,target:+$('#sTarget').value,weeks:Math.round(+$('#sWeeks').value),startDate:$('#sDate').value||today(),
-    patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok};}
+    patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok,morning:morn};}
   function valid(v){
     if(!(v.start>0))return 'Enter the units a week now.';
     if(!(v.target>=0)||v.target>=v.start)return 'The end amount must be lower than the amount now.';
@@ -688,17 +833,71 @@ function bindSetup(){
     o.textContent=!$('#sWa').value.trim()?'Start with + and the country code.':
       n.ok?'Messages and calls will go to +'+n.d+'.':n.msg;
   }
+  /*
+   * The safety gate.
+   *
+   * This used to let anyone through. Answer "yes, I have had a fit or seen
+   * things when I stopped", tick "my doctor has checked this and says I can
+   * start", and the app handed you a taper plan. Nobody can verify that tick,
+   * and withdrawal seizures and delirium are the two things on this page that
+   * actually kill people. So on the public copy there is no tick: a yes ends
+   * the setup, and a "not sure" ends it too, both with somewhere to go next.
+   *
+   * The copy a doctor fills in with a patient keeps the checkbox, because
+   * there the person confirming really is the clinician.
+   */
+  function stopReason(){
+    if(!PUBLIC)return '';
+    if(hist==='Yes')return 'yes';
+    if(hist==='I am not sure')return 'unsure';
+    return '';
+  }
   function histMsg(){
-    var m=$('#histMsg');
-    if(hist==='Yes'||hist==='I am not sure'){
-      m.innerHTML='<div class="note" style="margin-top:12px"><p>'+(hist==='Yes'?'Do not cut down on your own.':'Ask your doctor before you start.')+
-      ' People who have had fits or seen things after stopping need a health team to check them before they cut down. Show this screen to your doctor.</p>'+
-      '<label class="chk"><input type="checkbox" id="sOk"'+(ok?' checked':'')+'><span>My doctor has checked this and says I can start</span></label></div>';
+    var m=$('#histMsg'),r=stopReason();
+    if(r){
+      m.innerHTML='<div class="note note-stop" style="margin-top:12px"><p><b>'+
+        (r==='yes'?'Don\'t cut down on your own.':'Check with a doctor first.')+'</b> '+
+        (r==='yes'
+          ? 'A fit or seeing things after stopping means your body has come to depend on alcohol. Cutting down without a doctor can bring that on again, and it can kill. You need someone to look after you while you do this.'
+          : 'If you are not sure, treat it as a yes until a doctor tells you otherwise. It takes one appointment to find out.')+
+        '</p><p>You can still keep a record of what you drink. Take it with you \u2014 it is the first thing a doctor will ask about.</p>'+
+        '<button type="button" id="sDiary">Keep a record instead</button></div>';
+      $('#sDiary').onclick=function(){
+        /* No plan, no daily amount, no taper. Just the drink diary and the
+           page a doctor can read. */
+        state.settings={start:0,target:0,weeks:0,startDate:today(),patientName:'',doctorName:'',
+          doctorWa:'',emergency:$('#sEm')?$('#sEm').value.trim():'',history:hist,historyOk:false,
+          morning:morn,diary:true};
+        /* Only drinks that were actually filled in. "Start my plan" runs
+           edValid() first, which rejects the blank row the editor always
+           keeps at the end; this path skipped that and then crashed trying
+           to name a drink with no kind. */
+        state.myDrinks=clone(ed).filter(function(d){return d&&d.cat&&CATS[d.cat];});
+        state.editing=false;save();
+        try{sessionStorage.removeItem(PREFILL_KEY);}catch(e){}
+        tab='today';render();window.scrollTo(0,0);
+      };
+    } else if(!PUBLIC&&(hist==='Yes'||hist==='I am not sure')){
+      m.innerHTML='<div class="note" style="margin-top:12px"><p>'+(hist==='Yes'?'Don\'t cut down alone.':'Check before starting.')+
+      ' Anyone who has had fits or seen things after stopping needs a health team watching them while they cut down.</p>'+
+      '<label class="chk"><input type="checkbox" id="sOk"'+(ok?' checked':'')+'><span>I have checked this patient and they can start</span></label></div>';
       $('#sOk').onchange=function(){ok=this.checked;gate();};
     } else m.innerHTML='';
     gate();
   }
-  function gate(){$('#sGo').disabled=!hist||((hist!=='No')&&!ok);}
+  /* Morning drinking does not stop the plan. It is a warning that travels
+     with it, and it is on the doctor summary. */
+  function mornMsg(){
+    var m=$('#mornMsg');
+    m.innerHTML=morn==='Yes'
+      ? '<div class="note" style="margin-top:12px"><p><b>Tell a doctor about this before you start.</b> Needing a drink in the morning means your body has adjusted to alcohol. Cutting down is still the right idea, but go slowly, never stop all at once, and get someone to check on you.</p></div>'
+      : '';
+    gate();
+  }
+  function gate(){
+    var g=$('#sGo');if(!g)return;
+    g.disabled=!hist||!morn||(!PUBLIC&&hist!=='No'&&!ok);
+  }
   ['#sStart','#sTarget','#sWeeks'].forEach(function(id){$(id).addEventListener('input',preview);});
   /* For a self-starter, the number of weeks follows the amounts until they set it themselves */
   $('#sWeeks').addEventListener('input',function(){weeksTouched=true;});
@@ -706,10 +905,22 @@ function bindSetup(){
     if(weeksTouched)return;var w=weeksFor(+$('#sStart').value,+$('#sTarget').value);$('#sWeeks').value=w;preview();});});
   $('#sWa').addEventListener('input',waOut);
   $('#sHist').onclick=function(e){var b=e.target.closest('button');if(!b)return;hist=b.textContent;
-    Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});histMsg();};
+    Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});histMsg();tpSync();};
+  $('#sMorn').onclick=function(e){var b=e.target.closest('button');if(!b)return;morn=b.textContent;
+    Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});mornMsg();tpSync();};
   $('#sGo').onclick=function(){
     var v=vals(),wa=normWa($('#sWa').value),err=valid(v)||edValid()||(wa.ok?'':wa.msg),el=$('#setupErr');
-    if(err){el.textContent=err;el.classList.remove('hidden');Array.prototype.forEach.call(document.querySelectorAll('#app details'),function(d){d.open=true;});return;}
+    if(err){
+      el.textContent=err;el.classList.remove('hidden');
+      /* Send them to the screen the error is on. It used to throw every
+         collapsed section open instead, which told you something was wrong
+         but not where. */
+      if(/emergency/i.test(err))tpShow(stepOf('#sEm'));
+      else if(/drink|strength|size/i.test(err))tpShow(stepOf('#ed'));
+      else if(/\+|country code|whatsapp/i.test(err))tpShow(stepOf('#sWa'));
+      else tpShow(stepOf('#sStart'));
+      return;
+    }
     state.settings=v;state.myDrinks=clone(ed);state.editing=false;save();
     try{sessionStorage.removeItem(PREFILL_KEY);}catch(e){}
     tab='today';render();window.scrollTo(0,0);
@@ -728,7 +939,56 @@ function bindSetup(){
     };
     tool.oninput=fromCalc;tool.onchange=fromCalc;tool.onclick=function(){setTimeout(fromCalc,0);};
   }
-  preview();histMsg();waOut();fillInstall();
+  /* ---- one screen at a time ------------------------------------------
+     Six screens. Three of them hold Next back until they have what the
+     plan cannot be built without: the safety question, the emergency
+     number, and the numbers themselves. The rest you can walk past. */
+  var steps=[].slice.call(document.querySelectorAll('.tp-step'))
+  var at=0
+  /* Keyed off what is on the screen, not its number: the calculator screen
+     only exists on a first run, so the numbers shift by one without it. */
+  function stepOf(sel){
+    var el=document.querySelector(sel)
+    var sec=el&&el.closest('.tp-step')
+    return sec?+sec.dataset.step:1
+  }
+  function ready(n){
+    if(n===stepOf('#sHist')){
+      if(!hist||!morn)return false
+      if(stopReason())return false      /* there is nowhere to go next */
+      return hist==='No'||ok
+    }
+    if(n===stepOf('#sEm'))return !!$('#sEm').value.trim()
+    return true
+  }
+  function tpShow(n,moving){
+    at=Math.max(1,Math.min(steps.length,n))
+    steps.forEach(function(el){el.hidden=+el.dataset.step!==at})
+    $('#tpProgFill').style.width=(at/steps.length*100)+'%'
+    $('#tpProgCount').textContent='Step '+at+' of '+steps.length
+    tpSync()
+    if(moving){
+      $('#tpProg').scrollIntoView({block:'start'})
+      var f=steps[at-1].querySelector('input,button')
+      if(f&&f.type!=='button')f.focus({preventScroll:true})
+    }
+  }
+  function tpSync(){
+    var last=at===steps.length
+    $('#tpBack').hidden=at===1
+    $('#tpNext').hidden=last||!ready(at)
+    $('#sGo').hidden=!last
+    gate()
+  }
+  $('#tpBack').onclick=function(){tpShow(at-1,true)}
+  $('#tpNext').onclick=function(){tpShow(at+1,true)}
+  /* An answer can unlock Next without changing screen. */
+  document.querySelector('#app').addEventListener('input',tpSync)
+  document.querySelector('#app').addEventListener('change',tpSync)
+  $('#sHist').addEventListener('click',function(){setTimeout(tpSync,0)})
+  tpShow(1)
+
+  preview();histMsg();mornMsg();waOut();fillInstall();
 }
 /* The calculator's rows, keyed by their units, as drink kinds and sizes. Same map as audit.html. */
 var CALC_DRINKS={
@@ -759,10 +1019,65 @@ function overMsg(day){
 function overCardHTML(){
   var o=state.overCard;
   if(!o||!hasWa()||(o.day!==today()&&o.day!==addDays(today(),-1)))return '';
-  return '<div class="card soft"><h2>'+ic('chat')+' Tell '+esc(doc())+'</h2>'+
+  /* No icon on the heading: the button right under it has the same one,
+     and two of them in a card this size just looks like a mistake. */
+  return '<div class="card soft"><h2>Tell '+esc(doc())+'</h2>'+
     '<p>'+(PUBLIC?'You went over the plan. You can let '+esc(doc())+' know.':esc(Doc())+' asked you to send a message when you go over the plan.')+'</p>'+
     '<div class="row">'+waBtn(overMsg(o.day),'Send a message').replace('<a ','<a id="overSend" ')+'<button class="ghost" id="overNo">Not now</button></div>'+
     waDelay()+'</div>';
+}
+/* The day's guide drawn as the drink it is in.
+   A bar that fills up rewards drinking; a bottle that empties does not, and
+   it is the picture a person already has in their head. The shape follows
+   what they told us they drink, so it is their bottle, not a generic one. */
+/* Drawn on a 96x208 box: tall and slim, to suit a tall and slim card.
+   The shoulder is a curve rather than a mitre, which is what made the
+   first attempt look like a drawing of a bottle instead of a bottle. */
+var BOTTLE='M38 24v26c0 10-16 16-16 38v98a14 14 0 0 0 14 14h24a14 14 0 0 0 14-14V88c0-22-16-28-16-38V24z';
+var VESSELS={
+  beer:    {d:BOTTLE, cap:'M36 8h24a5 5 0 0 1 5 5v11H31V13a5 5 0 0 1 5-5z', top:24, bot:200},
+  bitters: {d:BOTTLE, cap:'M36 8h24a5 5 0 0 1 5 5v11H31V13a5 5 0 0 1 5-5z', top:24, bot:200},
+  /* A bowl on a stem, with a foot. */
+  wine:    {d:'M18 20h60l-4 52a26 26 0 0 1-20 25v63h14a5 5 0 0 1 0 10H28a5 5 0 0 1 0-10h14v-63a26 26 0 0 1-20-25z', cap:'', top:20, bot:100},
+  /* A tumbler, slightly tapered. */
+  spirits: {d:'M20 70h56l-7 112a14 14 0 0 1-14 12H41a14 14 0 0 1-14-12z', cap:'', top:70, bot:194}
+};
+function vesselHTML(cat,fracLeft,state,note,label,big,small){
+  var v=VESSELS[cat]||VESSELS.beer;
+  var f=Math.max(0,Math.min(1,fracLeft));
+  /* The liquid is a full-height rectangle clipped to the vessel, pushed
+     down by however much is gone. */
+  var top=v.top+(1-f)*(v.bot-v.top);
+  var cid='vclip'+Math.random().toString(36).slice(2,8);
+  return '<button type="button" class="tp-vessel is-'+state+'" data-note="'+esc(note)+'" '+
+    'aria-label="'+esc(label+': '+note)+'">'+
+    '<svg viewBox="0 0 96 208" aria-hidden="true">'+
+      '<defs><clipPath id="'+cid+'"><path d="'+v.d+'"/></clipPath></defs>'+
+      (v.cap?'<path class="tp-v-cap" d="'+v.cap+'"/>':'')+
+      '<path class="tp-v-body" d="'+v.d+'"/>'+
+      (f>0?'<rect class="tp-v-fill" clip-path="url(#'+cid+')" x="0" y="'+top.toFixed(1)+'" width="96" height="208"/>':'')+
+      '<path class="tp-v-line" d="'+v.d+'" fill="none" stroke-width="3"/>'+
+    '</svg>'+
+    '<span class="tp-dial-big">'+esc(big)+'</span>'+
+    '<span class="tp-dial-label">'+esc(small)+'</span>'+
+  '</button>';
+}
+/* A ring that fills clockwise from the top. Circumference-based, so the
+   arc is one dash on one circle rather than a path to compute. */
+function dialHTML(id,label,value,max,state,note){
+  var R=52,C=2*Math.PI*R,frac=Math.max(0,Math.min(1,max?value/max:0));
+  return '<button type="button" class="tp-dial is-'+state+'" data-note="'+esc(note)+'" '+
+    'aria-label="'+esc(label+': '+fmt(value)+' of '+fmt(max)+' units. '+note)+'">'+
+    '<svg viewBox="0 0 128 128" aria-hidden="true">'+
+      '<circle class="tp-dial-track" cx="64" cy="64" r="'+R+'" fill="none" stroke-width="12"/>'+
+      '<circle class="tp-dial-arc" cx="64" cy="64" r="'+R+'" fill="none" stroke-width="12" '+
+        'stroke-linecap="round" transform="rotate(-90 64 64)" '+
+        'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-frac)).toFixed(1)+'"/>'+
+      '<text class="tp-dial-num" x="64" y="60" text-anchor="middle" dominant-baseline="middle">'+esc(fmt(value))+'</text>'+
+      '<text class="tp-dial-of" x="64" y="80" text-anchor="middle" dominant-baseline="middle">of '+esc(fmt(max))+'</text>'+
+    '</svg>'+
+    '<span class="tp-dial-label">'+esc(label)+'</span>'+
+  '</button>';
 }
 function todayHTML(){
   var t=today(),day=logDay==='today'?t:addDays(t,-1),i=info(t),h='';
@@ -771,35 +1086,67 @@ function todayHTML(){
     h+='<div class="card soft"><p>Your plan starts on <b>'+esc(niceY(state.settings.startDate))+'</b>. Until then, keep a record of what you drink. This helps '+esc(doc())+'.</p></div>';
   } else {
     var p=plan();
-    h+='<p class="muted">'+(i.phase==='plan'?'Week '+i.week+' of '+p.length+'. Day '+i.day+' of '+(p.length*7)+'.':'Your '+p.length+' weeks are done. Keep to '+i.weekly+' units a week, and talk to '+esc(doc())+' about what comes next.')+'</p>';
+    if(i.phase!=='diary')h+='<p class="muted">'+(i.phase==='plan'
+      ? 'Week '+i.week+' of '+p.length+' \u00b7 day '+i.day+' of '+(p.length*7)
+      : 'Your '+p.length+' weeks are done. Stay at '+i.weekly+' units a week, and talk to '+esc(doc())+' about what next.')+'</p>';
   }
   if(!state.storageNoted){
     h+='<div class="note"><p>Your record stays only on this phone, in this browser. If you clear your browser data, the record is lost. Use the "For doctor" page to keep a copy before each visit.</p><button class="small ghost" id="noted">I understand</button></div>';
   }
   var tot=dayTotal(t),pct=Math.min(100,tot/i.daily*100||0);
-  h+='<div class="card">';
-  if(i.phase!=='before'){
-    var ph=phrases(i.daily);
-    h+='<div class="muted">Today you can have</div>'+
-      (ph.length?'<p class="allow">'+esc(cap(orList(ph)))+'.</p><p class="muted">That is '+fmt(i.daily)+' units.</p>':
-        '<p class="allow">'+fmt(i.daily)+' units</p><p class="muted">'+esc(equiv(i.daily))+'</p>');
+  var rem=i.daily-tot, state3=tot>i.daily?'over':(rem<=0?'done':'under');
+  if(i.phase==='diary'){
+    h+='<div class="card note-stop"><h2>Keeping a record</h2>'+
+      '<p>You are not on a taper plan. '+(state.settings.history==='Yes'
+        ? 'Cutting down on your own isn\'t safe for you \u2014 it needs a doctor looking after you.'
+        : 'Not until a doctor has checked whether cutting down on your own is safe for you.')+'</p>'+
+      '<p>Write down what you drink each day. Take the "For doctor" page to the appointment \u2014 it\'s the first thing they\'ll ask about.</p></div>';
   }
-  h+='<div class="row spread" style="margin-top:8px"><div class="muted">So far today: <b style="color:var(--t-ink)">'+fmt(tot)+'</b> of '+fmt(i.daily)+' units</div></div>'+
-     '<div class="bar"><i style="width:'+pct+'%"></i></div>';
-  if(tot>i.daily)h+='<p>This is over today\'s guide. That is okay to record. Tomorrow, go back to the guide. Do not cut down further than the plan to make up for it.</p>';
-  else if(i.phase!=='before'&&state.myDrinks.length){
-    var rem=i.daily-tot,rp=phrases(rem);
-    if(rem<=0)h+='<p>You have reached today\'s guide.</p>';
-    else if(tot>0)h+=rp.length?'<p>You can still have '+esc(orList(rp))+'.</p>':'<p>You are close to today\'s guide.</p>';
+  if(i.phase==='before')h+='<div class="card">';
+  if(i.phase!=='before'&&i.phase!=='diary'){
+    /* Two dials rather than two bars. A bar that fills to the end reads as
+       a goal met, and reaching your drinking guide is not an achievement;
+       a dial reads as a measure. Each one is a button: hover or focus it,
+       or tap it on a phone, and the line underneath says what it means.
+       The line is filled in on load too, so nothing is hidden behind a
+       gesture that a touch screen does not have. */
+    var wt0=weekTotal(Math.min(i.week,99));
+    var dayNote, weekNote;
+    if(state3==='over')dayNote='Write it down anyway. Tomorrow, go back to your amount \u2014 don\'t drink less to make up for today.';
+    else if(state3==='done')dayNote='That\'s your '+fmt(i.daily)+' units for today.';
+    else{
+      var rp=state.myDrinks.length?phrases(rem):[];
+      dayNote='That\'s '+fmt(rem)+' units of your '+fmt(i.daily)+' for today'+(tot>0?', after the '+fmt(tot)+' you\'ve had':'')+'.';
+    }
+    weekNote=wt0>i.weekly
+      ? 'You\'re over for this week. Stick to your daily amount for the rest of it \u2014 don\'t try to make up for it by stopping.'
+      : 'You\'ve had '+fmt(wt0)+' of this week\'s '+i.weekly+' units, so '+fmt(i.weekly-wt0)+' to go.';
+
+    var cat=(state.myDrinks[0]&&state.myDrinks[0].cat)||'beer';
+    var leftBig=state3==='over'?'Over':(rem<=0?'None left':fmt(rem)+' left');
+    var rp2=state.myDrinks.length?phrases(rem):[];
+    var hero=state3==='over'?'You\'ve gone over today.'
+      :rem<=0?'Nothing left today.'
+      :(rp2.length?cap(orList(rp2)):fmt(rem)+' units')+' left today.';
+    /* Two cards: the week and today. Each is a figure with its words
+       beside it, so nothing has to move when the day's line appears. */
+    h+='<div class="tp-grid">'+
+      '<div class="tp-tile tp-tile-week">'+
+        dialHTML('week','This week',wt0,i.weekly,wt0>i.weekly?'over':(wt0>=i.weekly?'done':'under'),weekNote)+
+        '<div class="tp-tile-words"><p class="tp-tile-note">'+esc(weekNote)+'</p></div>'+
+      '</div>'+
+      '<div class="tp-tile tp-tile-day">'+
+        vesselHTML(cat,i.daily?rem/i.daily:0,state3,dayNote,'Today',leftBig,'Today')+
+        '<div class="tp-tile-words">'+
+          '<p class="tp-tile-hero">'+esc(hero)+'</p>'+
+          '<p class="tp-tile-note tp-reveal">'+esc(dayNote)+'</p>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
   }
-  if(i.phase!=='before'){
-    var wt=weekTotal(Math.min(i.week,99)),wp=Math.min(100,wt/i.weekly*100||0);
-    h+='<div class="muted" style="margin-top:12px">This week: <b style="color:var(--t-ink)">'+fmt(wt)+'</b> of '+i.weekly+' units</div><div class="bar"><i style="width:'+wp+'%"></i></div>';
-    if(wt>i.weekly)h+='<p>This week is over the plan. Keep to the daily guide for the rest of the week. Do not try to make up for it by stopping.</p>';
-  }
-  h+='</div>';
-  if(i.phase==='plan'&&i.week<=2)h+='<div class="note">In weeks 1 and 2, do not stop suddenly. Spread a smaller amount across every day.</div>';
-  if(i.dry>0&&i.phase!=='before')h+='<div class="note">This week you can have up to '+plural(i.dry,'day')+' with no alcohol. Don\'t drink more on the other days.</div>';
+  if(i.phase==='before')h+='</div>';
+  if(i.phase==='plan'&&i.week<=2)h+='<div class="note">In weeks 1 and 2, don\'t stop suddenly. Spread a smaller amount across every day.</div>';
+  if(i.dry>0&&i.phase!=='before'&&i.phase!=='diary')h+='<div class="note">This week you can have up to '+plural(i.dry,'day')+' with no alcohol. Don\'t drink more on the other days.</div>';
 
   h+='<div class="card"><h2>Add a drink</h2><div class="seg" id="logDay" style="margin-bottom:12px">'+
      '<button aria-pressed="'+(logDay==='today')+'" data-d="today">Today</button><button aria-pressed="'+(logDay==='yest')+'" data-d="yest">Yesterday</button></div>';
@@ -1016,6 +1363,9 @@ function copyText(txt){
 function bindMain(){
   var app=document.getElementById('app');
   var n=$('#noted');if(n)n.onclick=function(){state.storageNoted=true;save();render();};
+  /* The reveal is CSS now — :hover and :focus-within on the day card — so
+     there is no shared caption to drive from here. The buttons keep their
+     aria-labels, which carry the same sentence for a screen reader. */
   var ld=$('#logDay');if(ld)ld.onclick=function(e){var b=e.target.closest('button');if(!b)return;logDay=b.dataset.d;render();};
   var mine=$('#mine');if(mine)mine.onclick=function(e){var b=e.target.closest('button[data-mine]');if(!b)return;
     var d=state.myDrinks[+b.dataset.mine],f=+b.dataset.f;addDrink(dLabel(d,f),d.ml*f,+d.pct);};
