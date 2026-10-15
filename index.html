@@ -259,7 +259,13 @@ var EXIT_URL=PUBLIC?'/habit-lab':AUDIT_URL;
 var PREFILL_KEY='pako-taper-prefill';
 function weeksFor(S,T){
   if(!(S>0)||!(T>=0)||T>=S)return '';
-  if(T===0)return 12;
+  /* Stopping altogether is a straight line down, so the weeks have to come
+     from how far there is to fall. Twelve for everybody meant a light
+     drinker crawling down in one-unit steps while someone on 42 dropped
+     3.5 units every week. Four units a week is the step: a heavier week
+     buys more weeks. The floor of four stops anyone being handed a
+     two-week stop, and twelve is all the form allows. */
+  if(T===0)return Math.max(4,Math.min(12,Math.ceil(S/4)));
   return Math.max(1,Math.min(12,Math.ceil(Math.log(T/S)/Math.log(1-PUBLIC_CUT))));
 }
 function prefill(){
@@ -1267,6 +1273,17 @@ function tableHTML(p,cur,drinks){
   h+='</tbody></table>';
   var dw=p.filter(function(w){return w.dry>0;})[0];
   if(dw)h+='<p class="muted" style="margin-top:8px">From week '+dw.n+', you can have up to 2 days a week with no alcohol. Don\'t drink more on the other days.</p>';
+  /* The form stops at twelve weeks. Up to about 48 units a week that is
+     enough to come down roughly four units at a time; past it the same
+     twelve weeks make each step bigger, which is the wrong way round. Say
+     so rather than quietly handing over a steeper plan. */
+  if(p.length>1&&p[p.length-1].weekly===0){
+    /* p[0] is week one's target, already a step below where they are now,
+       so the starting amount is one more step up again. */
+    var step=p[0].weekly-p[1].weekly;
+    var from=p[0].weekly+step;
+    if(step>4.5)h+='<div class="note" style="margin-top:12px"><p><b>This is a big drop each week.</b> Twelve weeks is as long as this plan goes, so coming down from '+plural(from,'unit')+' a week means losing about '+plural(step,'unit')+' every week. Talk to a doctor about stopping with support rather than doing it this fast on your own.</p></div>';
+  }
   return h;
 }
 function planHTML(){
