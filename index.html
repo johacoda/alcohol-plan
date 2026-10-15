@@ -427,9 +427,18 @@ function buildPlan(s){
      unit, and it never goes up from one week to the next. Dry days are allowed
      (up to 2, from week 3, once a day is 4 units or less) but do not raise it:
      sharing the week over fewer days made drinking days bigger. */
-  var S=+s.start,T=+s.target,N=+s.weeks,r=Math.pow(T/S,1/N),out=[],prev=Infinity;
+  /* The steps are proportional — take the same percentage off each week —
+     which is the shape a taper should have. It cannot reach zero, though:
+     (0/S)^(1/N) is 0, so every week came out as 0 and the plan told
+     someone on 42 units a week to drink nothing from week one. That is the
+     abrupt stop the page warns against on the screen above it. A target of
+     nothing steps down in equal amounts instead, and only the last week is
+     dry. */
+  var S=+s.start,T=+s.target,N=+s.weeks,out=[],prev=Infinity;
+  var toZero=!(T>0);
+  var r=toZero?0:Math.pow(T/S,1/N);
   for(var k=1;k<=N;k++){
-    var w=(k===N)?T:Math.round(S*Math.pow(r,k));
+    var w=(k===N)?T:(toZero?Math.round(S*(N-k)/N):Math.round(S*Math.pow(r,k)));
     var dry=0;
     if(k>=3&&w/7<=4)dry=2;
     var daily=Math.min(prev,Math.floor(w/7*2)/2);prev=daily;
@@ -1095,6 +1104,12 @@ function todayHTML(){
   }
   var tot=dayTotal(t),pct=Math.min(100,tot/i.daily*100||0);
   var rem=i.daily-tot, state3=tot>i.daily?'over':(rem<=0?'done':'under');
+  /* Under about 3.5 units a week the daily share rounds down to nothing,
+     so the last weeks of a plan that ends at zero would have told someone
+     with two units left "nothing left today", and called them over as soon
+     as they had one. On those weeks the day is the wrong unit of account —
+     the card measures the week instead. */
+  var byWeek=(i.phase!=='before'&&i.phase!=='diary'&&i.daily===0&&i.weekly>0);
   if(i.phase==='diary'){
     h+='<div class="card note-stop"><h2>Keeping a record</h2>'+
       '<p>You are not on a taper plan. '+(state.settings.history==='Yes'
@@ -1112,22 +1127,34 @@ function todayHTML(){
        gesture that a touch screen does not have. */
     var wt0=weekTotal(Math.min(i.week,99));
     var dayNote, weekNote;
-    if(state3==='over')dayNote='Write it down anyway. Tomorrow, go back to your amount \u2014 don\'t drink less to make up for today.';
-    else if(state3==='done')dayNote='That\'s your '+fmt(i.daily)+' units for today.';
+    if(byWeek){
+      var wLeft=i.weekly-wt0;
+      state3=wt0>i.weekly?'over':(wLeft<=0?'done':'under');
+      rem=Math.max(0,wLeft);
+      dayNote=state3==='over'
+        ? 'You\'re past this week\'s '+plural(i.weekly,'unit')+'. Write it down anyway, and pick the plan back up next week.'
+        : wLeft<=0
+          ? 'That\'s this week\'s '+plural(i.weekly,'unit')+' gone. Nothing more until next week.'
+          : 'This week you have '+plural(i.weekly,'unit')+' in total, not one for every day. '+plural(wLeft,'unit')+' still to go.';
+    }
+    else if(state3==='over')dayNote='Write it down anyway. Tomorrow, go back to your amount \u2014 don\'t drink less to make up for today.';
+    else if(state3==='done')dayNote='That\'s your '+plural(i.daily,'unit')+' for today.';
     else{
-      var rp=state.myDrinks.length?phrases(rem):[];
-      dayNote='That\'s '+fmt(rem)+' units of your '+fmt(i.daily)+' for today'+(tot>0?', after the '+fmt(tot)+' you\'ve had':'')+'.';
+      dayNote='That\'s '+plural(rem,'unit')+' of your '+fmt(i.daily)+' for today'+(tot>0?', after the '+fmt(tot)+' you\'ve had':'')+'.';
     }
     weekNote=wt0>i.weekly
       ? 'You\'re over for this week. Stick to your daily amount for the rest of it \u2014 don\'t try to make up for it by stopping.'
       : 'You\'ve had '+fmt(wt0)+' of this week\'s '+i.weekly+' units, so '+fmt(i.weekly-wt0)+' to go.';
 
     var cat=(state.myDrinks[0]&&state.myDrinks[0].cat)||'beer';
+    /* On a by-the-week stretch the bottle holds the week, not the day,
+       so the wording and the fill have to follow it. */
+    var span=byWeek?'this week':'today', cap0=byWeek?i.weekly:i.daily;
     var leftBig=state3==='over'?'Over':(rem<=0?'None left':fmt(rem)+' left');
     var rp2=state.myDrinks.length?phrases(rem):[];
-    var hero=state3==='over'?'You\'ve gone over today.'
-      :rem<=0?'Nothing left today.'
-      :(rp2.length?cap(orList(rp2)):fmt(rem)+' units')+' left today.';
+    var hero=state3==='over'?'You\'ve gone over '+span+'.'
+      :rem<=0?'Nothing left '+span+'.'
+      :(rp2.length?cap(orList(rp2)):plural(rem,'unit'))+' left '+span+'.';
     /* Two cards: the week and today. Each is a figure with its words
        beside it, so nothing has to move when the day's line appears. */
     h+='<div class="tp-grid">'+
@@ -1136,7 +1163,7 @@ function todayHTML(){
         '<div class="tp-tile-words"><p class="tp-tile-note">'+esc(weekNote)+'</p></div>'+
       '</div>'+
       '<div class="tp-tile tp-tile-day">'+
-        vesselHTML(cat,i.daily?rem/i.daily:0,state3,dayNote,'Today',leftBig,'Today')+
+        vesselHTML(cat,cap0?rem/cap0:0,state3,dayNote,byWeek?'This week':'Today',leftBig,byWeek?'This week':'Today')+
         '<div class="tp-tile-words">'+
           '<p class="tp-tile-hero">'+esc(hero)+'</p>'+
           '<p class="tp-tile-note tp-reveal">'+esc(dayNote)+'</p>'+
@@ -1228,7 +1255,14 @@ function tableHTML(p,cur,drinks){
   p.forEach(function(w){
     var f=d&&fit(w.daily,d);
     h+='<tr'+(w.n===cur?' class="now"':'')+'><td>'+w.n+'</td><td>'+w.weekly+'</td><td>'+
-      (f?esc(cap(amount(f.c,f.noun)))+' <span class="muted">'+fmt(w.daily)+' units</span>':fmt(w.daily)+' units')+'</td></tr>';
+      /* Once the week drops under about 3.5 units the daily share rounds
+         down to nothing, so the row read "2 | 0 units" — the week gives
+         you two and the day says none. Say what is actually true: the
+         units are there, just not every day. */
+      (w.daily===0&&w.weekly>0
+        ? esc(plural(w.weekly,'unit'))+' <span class="muted">across the week</span>'
+        : f?esc(cap(amount(f.c,f.noun)))+' <span class="muted">'+esc(plural(w.daily,'unit'))+'</span>'
+           :esc(plural(w.daily,'unit')))+'</td></tr>';
   });
   h+='</tbody></table>';
   var dw=p.filter(function(w){return w.dry>0;})[0];
