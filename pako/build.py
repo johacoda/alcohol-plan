@@ -21,7 +21,11 @@ def partial(name):
 app = read(os.path.join(HERE, '..', 'index.html'))
 style = re.search(r'<style>[\s\S]*?</style>', app).group(0)
 body = re.search(r'<body>([\s\S]*)</body>', app).group(1).strip()
-sub = re.search(r'<script>\s*\(function\(\)\{[\s\S]*?pk-subscribe[\s\S]*?</script>', read(os.path.join(SITE, 'audit.html'))).group(0)
+# The newsletter script, and only that script. The old pattern ran from the
+# first script on the page to the newsletter one, so anything added to
+# audit.html in between (a whole interactive tool, once) came along with it.
+sub = next(m.group(0) for m in re.finditer(r'<script>[\s\S]*?</script>', read(os.path.join(SITE, 'audit.html')))
+           if 'pk-subscribe' in m.group(0))
 
 out = read(os.path.join(HERE, 'shell.html'))
 for k, v in {

@@ -874,9 +874,9 @@ function bindSetup(){
         (r==='yes'?'Don\'t cut down on your own.':'Check with a doctor first.')+'</b> '+
         (r==='yes'
           ? 'A fit or seeing things after stopping means your body has come to depend on alcohol. Cutting down without a doctor can bring that on again, and it can kill. You need someone to look after you while you do this.'
-          : 'If you are not sure, treat it as a yes until a doctor tells you otherwise. It takes one appointment to find out.')+
-        '</p><p>You can still keep a record of what you drink. Take it with you \u2014 it is the first thing a doctor will ask about.</p>'+
-        '<button type="button" id="sDiary">Keep a record instead</button></div>';
+          : 'If you\'re not sure, treat it as a yes until a doctor tells you otherwise. It takes one appointment to find out.')+
+        '</p><p>You can still keep a diary of what you drink, and show it to your doctor.</p>'+
+        '<button type="button" id="sDiary">Keep a diary instead</button></div>';
       $('#sDiary').onclick=function(){
         /* No plan, no daily amount, no taper. Just the drink diary and the
            page a doctor can read. */
@@ -1117,11 +1117,11 @@ function todayHTML(){
      the card measures the week instead. */
   var byWeek=(i.phase!=='before'&&i.phase!=='diary'&&i.daily===0&&i.weekly>0);
   if(i.phase==='diary'){
-    h+='<div class="card note-stop"><h2>Keeping a record</h2>'+
-      '<p>You are not on a taper plan. '+(state.settings.history==='Yes'
-        ? 'Cutting down on your own isn\'t safe for you \u2014 it needs a doctor looking after you.'
-        : 'Not until a doctor has checked whether cutting down on your own is safe for you.')+'</p>'+
-      '<p>Write down what you drink each day. Take the "For doctor" page to the appointment \u2014 it\'s the first thing they\'ll ask about.</p></div>';
+    h+='<div class="card note-stop"><h2>Your drinking diary</h2>'+
+      '<p>'+(state.settings.history==='Yes'
+        ? 'Cutting down on your own could be dangerous for you. Do it with a doctor\'s help.'
+        : 'See a doctor before you cut down. They\'ll tell you if it\'s safe to do on your own.')+'</p>'+
+      '<p>Write down what you drink each day, and show the doctor the "For doctor" page.</p></div>';
   }
   if(i.phase==='before')h+='<div class="card">';
   if(i.phase!=='before'&&i.phase!=='diary'){
