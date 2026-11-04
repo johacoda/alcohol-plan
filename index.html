@@ -234,6 +234,9 @@ var AUDIT_URL='/habit-lab/check-your-drinking/';
    from, not the screening test most of these readers never took. */
 var EXIT_URL=PUBLIC?'/habit-lab':AUDIT_URL;
 var PREFILL_KEY='pako-taper-prefill';
+/* Umami, on pako.health only (github.io doesn't load it). Counts that a plan
+   was begun, set up and checked in on; never what anyone drinks. */
+function stat(n){try{window.umami&&window.umami.track(n,{tool:'Cut down safely'});}catch(e){}}
 function weeksFor(S,T){
   if(!(S>0)||!(T>=0)||T>=S)return '';
   /* Stopping altogether is a straight line down, so the weeks have to come
@@ -577,7 +580,7 @@ function bindTerms(){
   var b=$('#tBack');if(b)b.onclick=function(){viewTerms=false;render();window.scrollTo(0,0);};
   var box=$('#tTicks');if(!box)return;
   box.onchange=function(){$('#tAgree').disabled=box.querySelectorAll('input:checked').length<TERMS_TICKS.length;};
-  $('#tAgree').onclick=function(){state.terms={v:TERMS_V,at:new Date().toISOString()};save();render();window.scrollTo(0,0);};
+  $('#tAgree').onclick=function(){state.terms={v:TERMS_V,at:new Date().toISOString()};save();stat('Tool started');render();window.scrollTo(0,0);};
 }
 
 /* ---------- add to home screen (only where the page has a manifest) ---------- */
@@ -865,7 +868,7 @@ function bindSetup(){
            keeps at the end; this path skipped that and then crashed trying
            to name a drink with no kind. */
         state.myDrinks=clone(ed).filter(function(d){return d&&d.cat&&CATS[d.cat];});
-        state.editing=false;save();
+        state.editing=false;save();stat('Tool finished');
         try{sessionStorage.removeItem(PREFILL_KEY);}catch(e){}
         tab='today';render();window.scrollTo(0,0);
       };
@@ -913,7 +916,9 @@ function bindSetup(){
       else tpShow(stepOf('#sStart'));
       return;
     }
+    var fresh=!state.settings;
     state.settings=v;state.myDrinks=clone(ed);state.editing=false;save();
+    if(fresh)stat('Tool finished');
     try{sessionStorage.removeItem(PREFILL_KEY);}catch(e){}
     tab='today';render();window.scrollTo(0,0);
   };
@@ -1402,7 +1407,7 @@ function bindMain(){
   var sc=$('#saveCheck');if(sc)sc.onclick=function(){var t=today(),old=state.checkins[t]||{};
     var newSign=draft.signs.some(function(x){return (old.signs||[]).indexOf(x)<0;});
     state.checkins[t]={sleep:draft.sleep,craving:draft.craving,signs:draft.signs.slice(),note:draft.note,saved:true,cleared:newSign?false:!!old.cleared};
-    save();render();window.scrollTo(0,0);toast('Check-in saved');};
+    save();stat('Check-in');render();window.scrollTo(0,0);toast('Check-in saved');};
   var ep=$('#editPlan');if(ep)ep.onclick=function(){if(confirm('Change the plan? Do this only with your doctor. Your record will be kept.')){state.editing=true;render();window.scrollTo(0,0);}};
   var vt=$('#viewTerms');if(vt)vt.onclick=function(){viewTerms=true;render();window.scrollTo(0,0);};
   var cp=$('#copy');if(cp)cp.onclick=function(){copyText(summaryText());};
