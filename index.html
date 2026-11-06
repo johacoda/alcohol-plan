@@ -152,6 +152,9 @@ ul.keys li{margin:0 0 8px}
 .tp-prog-count{margin:var(--s-snug,10px) 0 0}
 .tp-nav{display:flex;align-items:center;gap:var(--s-4,16px);margin-top:var(--s-7,28px);flex-wrap:wrap}
 .tp-nav [hidden]{display:none !important}
+/* Add a drink shares the row with Next; with Back there too it takes its own row. */
+.tp-nav #tpAdd{order:-1}
+@media (max-width:480px){.tp-nav.has-back #tpAdd{flex-basis:100%}}
 @media (prefers-reduced-motion: reduce){.tp-prog-bar span{transition:none}}
 
 /* ===== Today: one card ==============================================
@@ -728,7 +731,7 @@ function edHTML(){
     }
     h+='</div>';
   });
-  if(ed.length<MAX_MINE)h+='<button type="button" class="ghost" data-act="add">'+ic('add')+(ed.length?'Add another drink':'Add a drink')+'</button>';
+  if(ed.length<MAX_MINE&&!edAddInNav)h+='<button type="button" class="ghost" data-act="add">'+ic('add')+(ed.length?'Add another drink':'Add a drink')+'</button>';
   return h;
 }
 function edValid(){
@@ -742,6 +745,9 @@ function edValid(){
   return '';
 }
 var edTouched=false;
+/* In set-up the add button sits in the step nav, beside Next. */
+var edAddInNav=false;
+function edAddLabel(){return ic('add')+(ed.length?'Add another drink':'Add a drink');}
 function bindEd(box,onChange){
   function draw(){box.innerHTML=edHTML();if(onChange)onChange();}
   box.onclick=function(e){
@@ -769,7 +775,7 @@ function drinksScreenHTML(){
     '<div class="row" style="margin-top:6px"><button id="edSave">Save my drinks</button><button class="ghost" id="edCancel">Cancel</button></div>';
 }
 function bindDrinksScreen(){
-  bindEd($('#ed'));
+  edAddInNav=false;bindEd($('#ed'));
   $('#edSave').onclick=function(){var err=edValid(),el=$('#edErr');
     if(err){el.textContent=err;el.classList.remove('hidden');return;}
     state.myDrinks=clone(ed);save();editingDrinks=false;render();window.scrollTo(0,0);toast('Your drinks are saved');};
@@ -843,6 +849,7 @@ function setupHTML(){
   '<div id="setupErr" class="note hidden"></div>'+
   '<div class="tp-nav" id="tpNav">'+
     '<button type="button" class="ghost" id="tpBack" hidden>Back</button>'+
+    '<button type="button" class="ghost" id="tpAdd" hidden></button>'+
     '<button type="button" id="tpNext">Next</button>'+
     '<button type="button" id="sGo" hidden>Start my plan</button>'+
     (state.editing?'<button class="ghost" id="sCancel">Cancel</button>':'')+
@@ -855,7 +862,8 @@ function bindSetup(){
   var pre=!state.settings&&prefill(),weeksTouched=!!state.settings;
   ed=state.myDrinks.length?clone(state.myDrinks):(pre&&pre.drinks.length?clone(pre.drinks):[{cat:'',size:0,ml:null,pct:'',name:''}]);
   edTouched=false;
-  var redraw=bindEd($('#ed'),function(){if($('#preview'))preview();});
+  edAddInNav=true;
+  var redraw=bindEd($('#ed'),function(){if($('#preview'))preview();if(steps)tpSync();});
   function vals(){return {start:+$('#sStart').value,target:+$('#sTarget').value,weeks:Math.round(+$('#sWeeks').value),startDate:$('#sDate').value||today(),
     patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok,morning:morn};}
   function valid(v){
@@ -1021,12 +1029,15 @@ function bindSetup(){
   function tpSync(){
     var last=at===steps.length
     $('#tpBack').hidden=at===1
+    var add=$('#tpAdd');add.hidden=at!==stepOf('#ed')||ed.length>=MAX_MINE;add.innerHTML=edAddLabel()
+    $('#tpNav').classList.toggle('has-back',at!==1)
     $('#tpNext').hidden=last||!ready(at)
     $('#sGo').hidden=!last
     gate()
   }
   $('#tpBack').onclick=function(){tpShow(at-1,true)}
   $('#tpNext').onclick=function(){tpShow(at+1,true)}
+  $('#tpAdd').onclick=function(){ed.push({cat:'',size:0,ml:null,pct:'',name:''});edTouched=true;redraw()}
   /* An answer can unlock Next without changing screen. */
   document.querySelector('#app').addEventListener('input',tpSync)
   document.querySelector('#app').addEventListener('change',tpSync)
