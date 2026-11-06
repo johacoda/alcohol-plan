@@ -695,7 +695,8 @@ function render(){
   });
   nav.classList.remove('hidden');
   Array.prototype.forEach.call(nav.querySelectorAll('button'),function(b){b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');});
-  var html='<header class="row spread"><h1>My alcohol plan</h1><button class="small ghost" id="startAgain">Start again</button></header>';
+  var first=(state.settings.patientName||'').trim().split(/\s+/)[0];
+  var html='<header class="row spread"><h1>'+(first?'Hi, '+esc(first):'My alcohol plan')+'</h1><button class="small ghost" id="startAgain">Start again</button></header>';
   if(!storageOK)html+='<div class="note">This phone isn\'t saving your record. Use the "For doctor" page often to keep a copy.</div>';
   html+='<div class="tab'+(tab==='today'?' on':'')+'" id="tab-today">'+todayHTML()+'</div>';
   html+='<div class="tab'+(tab==='check'?' on':'')+'" id="tab-check">'+checkHTML()+'</div>';
@@ -808,6 +809,10 @@ function setupHTML(){
     }).join('');
   }
 
+  /* First, because it's easy, and the tracker greets them by it. */
+  step('What\'s your name?','',
+    '<label class="field" style="margin:0"><input type="text" id="sName" autocomplete="name" aria-label="Your name" maxlength="60" value="'+esc(s.patientName)+'"></label>');
+
   if(calc)step('What you drink in a normal week',
     'Add up a normal week. You can change it later.',
     '<div id="unitsSlot"></div>');
@@ -828,8 +833,7 @@ function setupHTML(){
   step('Emergency number','The number you\'d call for an ambulance where you live.',
     '<label class="field" style="margin:0"><span>Emergency number</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"></label>');
 
-  step(PUBLIC?'Your doctor':'You and your doctor','',
-    '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"></label>'+
+  step('Your doctor','',
     '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
     '<label class="field" style="margin:0"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
     '<small class="muted" id="waOut"></small></label>');
@@ -916,7 +920,7 @@ function bindSetup(){
       $('#sDiary').onclick=function(){
         /* No plan, no daily amount, no taper. Just the drink diary and the
            page a doctor can read. */
-        state.settings={start:0,target:0,weeks:0,startDate:today(),patientName:'',doctorName:'',
+        state.settings={start:0,target:0,weeks:0,startDate:today(),patientName:$('#sName').value.trim(),doctorName:'',
           doctorWa:'',emergency:$('#sEm')?$('#sEm').value.trim():'',history:hist,historyOk:false,
           morning:morn,diary:true};
         /* Only drinks that were actually filled in. "Start my plan" runs
@@ -1032,8 +1036,9 @@ function bindSetup(){
     var add=$('#tpAdd');add.hidden=at!==stepOf('#ed')||ed.length>=MAX_MINE;add.innerHTML=edAddLabel()
     $('#tpNav').classList.toggle('has-back',at!==1)
     $('#tpNext').hidden=last||!ready(at)
-    /* The doctor screen is optional on pako.health: Next reads Skip until something is typed. */
-    var skip=PUBLIC&&at===stepOf('#sDoc')&&!['#sName','#sDoc','#sWa'].some(function(q){return $(q).value.trim()})
+    /* The name and doctor screens are optional on pako.health: Next reads Skip until something is typed. */
+    var opt=at===stepOf('#sName')?['#sName']:at===stepOf('#sDoc')?['#sDoc','#sWa']:null
+    var skip=PUBLIC&&opt&&!opt.some(function(q){return $(q).value.trim()})
     $('#tpNext').textContent=skip?'Skip':'Next'
     $('#sGo').hidden=!last
     gate()
