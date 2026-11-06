@@ -97,14 +97,19 @@ tr.now td{background:var(--t-ptint);font-weight:700}
 .dot.done{background:var(--t-p1);border-color:var(--t-p1);color:var(--t-on-p1)}
 .dot.today{border-color:var(--t-p1);border-width:3px;color:var(--t-p1);font-weight:800}
 .note{padding:10px 12px;background:var(--t-ptint);border-radius:10px;margin:0 0 12px}
-/* A notice you can close: the x says so. */
-.tip{position:relative;background:var(--t-ptint);border-radius:14px;padding:12px 16px;margin:0 0 14px;font-size:.95rem}
-.tip h2{font-size:1rem;margin:0 0 2px;padding-right:36px}
-.tip p{margin:0}
-.tip .x{position:absolute;top:4px;right:4px;width:44px;height:44px;padding:0;border:none;border-radius:50%;background:transparent;color:var(--t-muted)}
-.tip .x:hover{background:var(--t-surface);color:var(--t-ink)}
-.tip .x .ic{width:22px;height:22px}
-.tip button:not(.x){margin-top:10px}
+/* One-time sheet above the tab bar. Not modal: the page stays usable behind it. */
+.sheet{position:fixed;left:12px;right:12px;max-width:520px;margin:0 auto;z-index:10;background:var(--t-card);border:1px solid var(--t-line);border-radius:16px;padding:16px;box-shadow:0 8px 28px rgba(0,0,0,.18);font-size:.95rem;transform:translateY(calc(100% + 120px));visibility:hidden}
+.sheet.on{transform:none;visibility:visible}
+@media (prefers-reduced-motion: no-preference){.sheet{transition:transform .28s ease,visibility 0s .28s}.sheet.on{transition:transform .28s ease}}
+/* It sits outside #app, so on pako.health the site's own heading sizes reach it. */
+.sheet h2{font-family:"Hanken Grotesk","Noto Sans",system-ui,sans-serif!important;font-size:1.1rem!important;line-height:1.3!important;font-weight:600!important;color:var(--t-ink)!important;margin:0 0 4px!important;padding-right:36px}
+.sheet p{margin:0 0 4px!important;font-size:.95rem!important;line-height:1.45!important;color:var(--t-ink)!important}
+.sheet .row{margin-top:12px;gap:8px}
+.sheet .x{position:absolute;top:6px;right:6px;width:44px;height:44px;padding:0;border:none;border-radius:50%;background:transparent;color:var(--t-muted)}
+.sheet .x:hover{background:var(--t-surface);color:var(--t-ink)}
+.sheet .x .ic{width:22px;height:22px}
+button.link{background:none;border:none;padding:0;color:var(--t-p1);font-weight:600;text-decoration:underline;font-size:inherit}
+.ios-line{margin:-4px 0 12px}
 .warn{border:2px solid var(--t-red);background:var(--t-red-tint);border-radius:14px;padding:16px;margin:var(--s-5,20px) 0 var(--s-mid,14px)}
 .warn h2{color:var(--t-red-ink);display:flex;gap:6px;align-items:center}
 .warn h3{margin-top:12px}
@@ -600,27 +605,54 @@ function bindTerms(){
 var installEvt=null;
 function standalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
 function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
-/* On iPhone the home screen copy keeps its own record, so it is offered only before
-   the plan starts. Android installs share the record, so it is offered any time. */
-function installHTML(where){
-  if(!document.querySelector('link[rel=manifest]')||standalone()||state.installDismissed)return '';
-  /* One notice at a time: where the record lives comes first. */
-  if(where==='today'&&!state.storageNoted)return '';
-  var no='<button class="x" data-inst="no" aria-label="Close">'+ic('close')+'</button>';
-  if(installEvt)return '<div class="tip"><h2>Keep it on your phone</h2><p>Add it to your home screen. It works without internet.</p>'+
-    '<button class="small" data-inst="go">'+ic('add')+'Add to home screen</button>'+no+'</div>';
-  if(isIOS()&&where==='setup')return '<div class="tip"><h2>Keep it on your phone</h2><p>Before you start, tap Share, then Add to Home Screen. Open the plan from there.</p>'+no+'</div>';
+/* On iPhone the home screen copy keeps its own record, so it's offered only before
+   the plan starts, as one quiet line. Elsewhere nothing interrupts set-up or the
+   page: the first drink you add brings up one sheet, once, that says where the
+   record lives and offers the home screen. Closing it is remembered. */
+function canInstall(){return !!document.querySelector('link[rel=manifest]')&&!standalone()&&!state.installDismissed;}
+function iosLineHTML(){
+  if(!isIOS()||!canInstall())return '';
+  return '<p class="muted ios-line">On an iPhone? <button class="link" data-sheet="ios">Add it to your home screen first</button></p>';
+}
+function sheetHTML(kind){
+  var x='<button class="x" data-sheet="close" aria-label="Close">'+ic('close')+'</button>';
+  if(kind==='ios')return '<h2>Add it to your home screen</h2><p>Tap Share, then Add to Home Screen. Open the plan from there, or your record stays in Safari.</p>'+
+    '<div class="row"><button class="small" data-sheet="close">OK</button></div>'+x;
+  var inst=installEvt&&canInstall(),h='';
+  if(kind==='first')h+='<h2>Saved on this phone only</h2><p>Clearing your browser data deletes it. Send a copy from For doctor before each visit.</p>';
+  else h+='<h2>Keep it on your phone</h2>';
+  if(inst)h+='<p>Add it to your home screen to open it in one tap, even offline.</p>';
+  h+='<div class="row">'+(inst?'<button class="small" data-sheet="go">'+ic('add')+'Add to home screen</button><button class="small ghost" data-sheet="close">Not now</button>'
+    :'<button class="small" data-sheet="close">OK</button>')+'</div>'+x;
+  return h;
+}
+function nextSheet(){
+  if(!state.storageNoted)return 'first';
+  if(installEvt&&canInstall())return 'install';
   return '';
 }
-function fillInstall(){
-  var slot=document.getElementById('instSlot');if(!slot)return;
-  slot.innerHTML=installHTML(state.settings?'today':'setup');
-  slot.onclick=function(e){var b=e.target.closest('[data-inst]');if(!b)return;
-    if(b.dataset.inst==='go'&&installEvt){installEvt.prompt();installEvt.userChoice.then(function(){installEvt=null;fillInstall();});}
-    else{state.installDismissed=true;save();slot.innerHTML='';}};
+function openSheet(kind){
+  var el=document.getElementById('sheet');
+  if(!el){el=document.createElement('div');el.id='sheet';el.className='sheet';el.setAttribute('role','dialog');el.setAttribute('aria-modal','false');document.body.appendChild(el);
+    el.onclick=function(e){var b=e.target.closest('[data-sheet]');if(!b)return;
+      if(b.dataset.sheet==='go'&&installEvt){installEvt.prompt();installEvt.userChoice.then(function(){installEvt=null;});}
+      closeSheet();};
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});}
+  var nav=document.getElementById('nav');
+  el.style.bottom=(nav&&!nav.classList.contains('hidden')?nav.offsetHeight:0)+12+'px';
+  el.dataset.kind=kind;el.innerHTML=sheetHTML(kind);el.setAttribute('aria-label',el.querySelector('h2').textContent);
+  var t=document.getElementById('toast');if(t)t.classList.remove('on');
+  void el.offsetHeight;el.classList.add('on');
 }
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();installEvt=e;fillInstall();});
-window.addEventListener('appinstalled',function(){installEvt=null;fillInstall();});
+function closeSheet(){
+  var el=document.getElementById('sheet');if(!el||!el.classList.contains('on'))return;
+  var k=el.dataset.kind;
+  if(k==='first')state.storageNoted=true;
+  if(k==='install'||k==='ios'||(k==='first'&&installEvt))state.installDismissed=true;
+  save();el.classList.remove('on');
+}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();installEvt=e;});
+window.addEventListener('appinstalled',function(){installEvt=null;state.installDismissed=true;save();});
 
 /* ---------- routing ---------- */
 var tab='today', logDay='today', editingDrinks=false;
@@ -669,7 +701,7 @@ function render(){
   html+='<div class="tab'+(tab==='summary'?' on':'')+'" id="tab-summary">'+summaryHTML()+'</div>';
   html+=warnPanel(0);
   app.innerHTML=html;
-  bindMain();fillInstall();
+  bindMain();
   if(signup)signup.hidden=false;
 }
 
@@ -806,7 +838,7 @@ function setupHTML(){
     '<label class="field"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
     '<div id="preview"></div>');
 
-  var h='<h1>Set up your plan</h1><div id="instSlot"></div>'+
+  var h='<h1>Set up your plan</h1>'+iosLineHTML()+
   '<div class="tp-prog" id="tpProg"><div class="tp-prog-bar"><span id="tpProgFill"></span></div>'+
   '<p class="tp-prog-count muted" id="tpProgCount">&nbsp;</p></div>'+
   (pre?'<div class="note"><p style="margin:0">Filled in from Check your drinking. Check it before you start.</p></div>':'')+
@@ -1004,7 +1036,8 @@ function bindSetup(){
   $('#sHist').addEventListener('click',function(){setTimeout(tpSync,0)})
   tpShow(1)
 
-  preview();histMsg();mornMsg();waOut();fillInstall();
+  preview();histMsg();mornMsg();waOut();
+  var il=document.querySelector('.ios-line');if(il)il.onclick=function(e){if(e.target.closest('[data-sheet=ios]'))openSheet('ios');};
 }
 /* The calculator's rows, keyed by their units, as drink kinds and sizes. Same map as audit.html. */
 var CALC_DRINKS={
@@ -1088,7 +1121,7 @@ function dialHTML(value,max,state){
 }
 function todayHTML(){
   var t=today(),day=logDay==='today'?t:addDays(t,-1),i=info(t),h='';
-  h+=overCardHTML()+'<div id="instSlot"></div>';
+  h+=overCardHTML();
   if(i.phase==='before'){
     h+='<div class="card soft"><p>Your plan starts on <b>'+esc(niceY(state.settings.startDate))+'</b>. Until then, keep a record of what you drink. This helps '+esc(doc())+'.</p></div>';
   } else {
@@ -1096,9 +1129,6 @@ function todayHTML(){
     if(i.phase!=='diary')h+='<p class="muted">'+(i.phase==='plan'
       ? 'Week '+i.week+' of '+p.length+' \u00b7 day '+i.day+' of '+(p.length*7)
       : 'Your '+p.length+' weeks are done. Stay at '+i.weekly+' units a week, and talk to '+esc(doc())+' about what next.')+'</p>';
-  }
-  if(!state.storageNoted){
-    h+='<div class="tip"><h2>Saved on this phone only</h2><p>Clearing your browser data deletes it. Send a copy from For doctor before each visit.</p><button class="x" id="noted" aria-label="Close">'+ic('close')+'</button></div>';
   }
   var tot=dayTotal(t),pct=Math.min(100,tot/i.daily*100||0);
   var rem=i.daily-tot, state3=tot>i.daily?'over':(rem<=0?'done':'under');
@@ -1256,6 +1286,7 @@ function addDrink(name,ml,pct){
     }
   }
   save();render();toast('Added '+fmt(u)+' units');
+  var sk=nextSheet();if(sk)openSheet(sk);
   if(state.overCard&&state.overCard.day===day)window.scrollTo(0,0);
 }
 
@@ -1439,7 +1470,6 @@ function copyText(txt){
 /* ---------- events ---------- */
 function bindMain(){
   var app=document.getElementById('app');
-  var n=$('#noted');if(n)n.onclick=function(){state.storageNoted=true;save();render();};
   /* The reveal is CSS now — :hover and :focus-within on the day card — so
      there is no shared caption to drive from here. The buttons keep their
      aria-labels, which carry the same sentence for a screen reader. */
