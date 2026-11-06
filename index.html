@@ -69,8 +69,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .mine.other{margin:0}
 .mine.other>summary{list-style:none;cursor:pointer}
 .mine.other>summary::-webkit-details-marker{display:none}
-/* Inside the grey row, the drink tiles take the card colour so they still read as tiles. */
-.mine.other .drink{background:var(--t-card)}
+/* Inside the grey row, the chips take the card colour so they still read as chips. */
+.mine.other .pills button:not([aria-pressed="true"]){background:var(--t-card)}
 .seg{display:flex;background:var(--t-surface);border-radius:10px;padding:var(--s-1,4px);gap:var(--s-1,4px)}
 .seg button{flex:1;background:transparent;border:none;color:var(--t-ink);padding:8px;font-weight:600}
 .seg button[aria-pressed="true"]{background:var(--t-card);color:var(--t-p1);box-shadow:0 1px 2px rgba(0,0,0,.15)}
@@ -647,7 +647,7 @@ function render(){
   });
   nav.classList.remove('hidden');
   Array.prototype.forEach.call(nav.querySelectorAll('button'),function(b){b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');});
-  var html='<header><h1>My alcohol plan</h1></header>';
+  var html='<header class="row spread"><h1>My alcohol plan</h1><button class="small ghost" id="startAgain">Start again</button></header>';
   if(!storageOK)html+='<div class="note">This phone is not saving your record. Use the "For doctor" page often to keep a copy.</div>';
   html+='<div class="tab'+(tab==='today'?' on':'')+'" id="tab-today">'+todayHTML()+'</div>';
   html+='<div class="tab'+(tab==='check'?' on':'')+'" id="tab-check">'+checkHTML()+'</div>';
@@ -1178,16 +1178,7 @@ function todayHTML(){
      It logs the drink without adding it to My drinks. */
   h+='<details class="mine other"><summary class="head">'+ic('add')+'<div><b>Another drink</b>'+
      '<div class="muted">A drink that isn\'t on your list.</div></div></summary>'+
-     '<div class="grid" id="drinkGrid" style="margin-top:12px">';
-  DRINKS.concat(state.custom).forEach(function(d,ix){
-    h+='<button class="drink" data-ix="'+ix+'">'+ic(d.icon||'local_bar')+' '+esc(d.name)+'<span>'+esc(d.detail||(d.ml+'ml at '+d.pct+'%'))+'</span><b>'+fmt(unitsOf(d.ml,d.pct))+' units</b></button>';
-  });
-  h+='</div><h3>Or type it in</h3>'+
-     '<label class="field"><span>Name (you can leave this empty)</span><input type="text" id="cName"></label>'+
-     '<div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Millilitres</span><input type="number" id="cMl" min="1" inputmode="decimal"></label>'+
-     '<label class="field" style="flex:1"><span>Alcohol %</span><input type="number" id="cPct" min="0.1" max="96" step="0.1" inputmode="decimal"></label></div>'+
-     '<p id="cUnits" class="muted">The units will show here.</p>'+
-     '<button id="cAdd">'+ic('add')+'Add this drink</button></details></div>';
+     '<div id="onePick">'+oneHTML()+'</div></details></div>';
 
   var list=state.drinks[day]||[];
   h+='<div class="card"><div class="row spread"><h2 style="margin:0">'+(logDay==='today'?'Today':'Yesterday')+': '+fmt(dayTotal(day))+' units</h2>'+
@@ -1198,6 +1189,45 @@ function todayHTML(){
     h+='</ul>';}
   h+='</div>';
   return h;
+}
+/* A drink not on My drinks: the kind, then the size, then one button that
+   says what it adds. The same choices as the drinks editor, so nothing new to
+   learn, and nothing to read until you've picked. */
+var one={cat:'',size:-1};
+var KIND={beer:'Beer',stout:'Stout',wine:'Wine',spirits:'Spirits',overproof:'Strong rum',bitters:'Bitters',other:'Something else'};
+function oneHTML(){
+  var c=one.cat?CATS[one.cat]:null;
+  var h='<p class="lbl">What kind?</p><div class="pills" id="oneCat">'+
+    CAT_ORDER.map(function(k){return '<button type="button" data-v="'+k+'" aria-pressed="'+(one.cat===k)+'">'+ic(CATS[k].icon)+esc(KIND[k])+'</button>';}).join('')+'</div>';
+  if(c&&one.cat!=='other'){
+    h+='<p class="lbl">What size?</p><div class="pills" id="oneSize">'+
+      c.sizes.map(function(z,j){return '<button type="button" data-v="'+j+'" aria-pressed="'+(one.size===j)+'">'+esc(cap(z.n))+'</button>';}).join('')+'</div>';
+    var z=c.sizes[one.size];
+    if(z)h+='<button type="button" class="wide" id="oneAdd" style="margin-top:14px">'+ic('add')+'Add 1 '+esc(z.n)+' · '+fmt(unitsOf(z.ml,c.pct))+' units</button>'+
+      '<p class="muted" style="margin:6px 0 0">'+z.ml+'ml at '+c.pct+'%. If the label says something different, choose Something else.</p>';
+  }
+  if(one.cat==='other'){
+    h+='<label class="field" style="margin-top:12px"><span>What is it? (you can leave this empty)</span><input type="text" id="cName" maxlength="40" placeholder="For example: palm wine"></label>'+
+     '<div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Millilitres</span><input type="number" id="cMl" min="1" inputmode="decimal"></label>'+
+     '<label class="field" style="flex:1"><span>Alcohol %</span><input type="number" id="cPct" min="0.1" max="96" step="0.1" inputmode="decimal"></label></div>'+
+     '<button type="button" class="wide" id="cAdd" disabled>'+ic('add')+'Add this drink</button>';
+  }
+  return h;
+}
+function bindOne(){
+  var box=$('#onePick');if(!box)return;
+  var redraw=function(){box.innerHTML=oneHTML();bindOne();};
+  $('#oneCat').onclick=function(e){var b=e.target.closest('button');if(!b)return;
+    one.cat=one.cat===b.dataset.v?'':b.dataset.v;one.size=-1;redraw();};
+  var sz=$('#oneSize');if(sz)sz.onclick=function(e){var b=e.target.closest('button');if(!b)return;one.size=+b.dataset.v;redraw();};
+  var oa=$('#oneAdd');if(oa)oa.onclick=function(){var c=CATS[one.cat],z=c.sizes[one.size];
+    var nm=cap(z.n)+' of '+c.short;one={cat:'',size:-1};addDrink(nm,z.ml,c.pct);};
+  var cMl=$('#cMl'),cPct=$('#cPct'),cA=$('#cAdd');
+  if(cMl){var upd=function(){var ml=+cMl.value,pc=+cPct.value,ok=ml>0&&pc>0&&pc<=96;cA.disabled=!ok;
+      cA.innerHTML=ic('add')+(ok?'Add this drink · '+fmt(unitsOf(ml,pc))+' units':'Add this drink');};
+    cMl.oninput=upd;cPct.oninput=upd;
+    cA.onclick=function(){var ml=+cMl.value,pc=+cPct.value;if(!(ml>0&&pc>0&&pc<=96))return;
+      var nm=$('#cName').value.trim()||(ml+'ml at '+pc+'%');one={cat:'',size:-1};addDrink(nm,ml,pc);};}
 }
 function addDrink(name,ml,pct){
   var u=unitsOf(ml,pct);
@@ -1405,12 +1435,14 @@ function bindMain(){
   var em=$('#editMine');if(em)em.onclick=function(){ed=state.myDrinks.length?clone(state.myDrinks):[{cat:'',size:0,ml:null,pct:'',name:''}];editingDrinks=true;render();window.scrollTo(0,0);};
   var os=$('#overSend');if(os)os.addEventListener('click',function(){state.overCard=null;save();setTimeout(render,300);});
   var on=$('#overNo');if(on)on.onclick=function(){state.overCard=null;save();render();};
-  var g=$('#drinkGrid');if(g)g.onclick=function(e){var b=e.target.closest('button');if(!b)return;var d=DRINKS.concat(state.custom)[+b.dataset.ix];addDrink(d.name,d.ml,d.pct);};
-  var cMl=$('#cMl'),cPct=$('#cPct');
-  if(cMl){var upd=function(){var ml=+cMl.value,pc=+cPct.value;$('#cUnits').textContent=(ml>0&&pc>0)?'That is '+fmt(unitsOf(ml,pc))+' units.':'The units will show here.';};cMl.oninput=upd;cPct.oninput=upd;
-    $('#cAdd').onclick=function(){var ml=+cMl.value,pc=+cPct.value;if(!(ml>0&&pc>0&&pc<=96)){toast('Enter millilitres and alcohol %');return;}
-      var nm=$('#cName').value.trim()||(ml+'ml at '+pc+'%');
-      addDrink(nm,ml,pc);};}
+  bindOne();
+  /* Wipes this phone's record and goes back to set-up. The terms stay agreed:
+     starting again isn't a new person. */
+  var sa=$('#startAgain');if(sa)sa.onclick=function(){
+    if(!confirm('Start again? This deletes your plan, your drinks and your check-ins from this phone. You can\'t undo it. If your doctor needs your record, send it from For doctor first.'))return;
+    var keep=state.terms?{terms:state.terms}:{};memState=keep;
+    try{localStorage.setItem(KEY,JSON.stringify(keep));}catch(e){}
+    location.reload();};
   var u=$('#undo');if(u)u.onclick=function(){var day=logDay==='today'?today():addDays(today(),-1);var l=state.drinks[day];if(l&&l.length){var x=l.pop();save();render();toast('Removed '+x.name);}};
   Array.prototype.forEach.call(app.querySelectorAll('[data-del]'),function(b){b.onclick=function(){var day=logDay==='today'?today():addDays(today(),-1);state.drinks[day].splice(+b.dataset.del,1);save();render();};});
   Array.prototype.forEach.call(app.querySelectorAll('.pills[data-f]'),function(el){el.onclick=function(e){var b=e.target.closest('button');if(!b)return;draft[el.dataset.f]=b.textContent;
