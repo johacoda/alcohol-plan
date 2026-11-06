@@ -829,7 +829,7 @@ function setupHTML(){
     '<label class="field" style="margin:0"><span>Emergency number</span><input type="tel" id="sEm" value="'+esc(s.emergency)+'"></label>');
 
   step(PUBLIC?'Your doctor':'You and your doctor',PUBLIC?'You can skip this.':'',
-    '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"><small class="muted">So your doctor knows who sent a message.</small></label>'+
+    '<label class="field"><span>Your name</span><input type="text" id="sName" autocomplete="name" value="'+esc(s.patientName)+'"></label>'+
     '<label class="field"><span>Doctor\'s name</span><input type="text" id="sDoc" placeholder="For example: Dr Reuben" value="'+esc(s.doctorName)+'"></label>'+
     '<label class="field" style="margin:0"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
     '<small class="muted" id="waOut"></small></label>');
