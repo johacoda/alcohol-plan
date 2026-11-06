@@ -154,6 +154,9 @@ ul.keys li{margin:0 0 8px}
 .tp-nav [hidden]{display:none !important}
 /* Add a drink shares the row with Next; with Back there too it takes its own row. */
 .tp-nav #tpAdd{order:-1}
+.stepper{display:flex;align-items:center;gap:8px;margin-top:6px}
+.stepper button{width:48px;height:48px;padding:0;font-size:1.4rem;line-height:1}
+.stepper input{width:80px;text-align:center}
 @media (max-width:480px){.tp-nav.has-back #tpAdd{flex-basis:100%}}
 @media (prefers-reduced-motion: reduce){.tp-prog-bar span{transition:none}}
 
@@ -277,7 +280,7 @@ function prefill(){
     var weekly=Math.round(+p.weekly);
     var drinks=(Array.isArray(p.drinks)?p.drinks:[]).filter(function(d){
       return d&&CATS[d.cat]&&+d.ml>0&&+d.pct>0&&+d.pct<=96;
-    }).slice(0,MAX_MINE).map(function(d){return {cat:d.cat,size:+d.size|0,ml:+d.ml,pct:+d.pct,name:''};});
+    }).slice(0,MAX_MINE).map(function(d){return {cat:d.cat,size:+d.size|0,ml:+d.ml,pct:+d.pct,name:'',perWeek:Math.max(0,Math.round(+d.perWeek||0))};});
     return {weekly:weekly>0?weekly:'',drinks:drinks};
   }catch(e){return null;}
 }
@@ -423,6 +426,16 @@ function phrases(u){
   return state.myDrinks.map(function(d){var f=fit(u,d);return f?amount(f.c,f.noun)+' of your '+dWhat(d):null;}).filter(Boolean);
 }
 function orList(a){return a.join(', or ');}
+/* Clients never see units: amounts are counted in their first drink, to the
+   nearest half. Units stay on the For doctor page and in messages to the doctor. */
+function mainDrink(list){return (list||state.myDrinks||[]).filter(function(x){return dUnits(x)>0;})[0]||null;}
+function nouns(d){return pl(dNoun(d));}
+function nOf(u,d){var cu=d&&dUnits(d);return cu?Math.round(u/cu*2)/2:null;}
+function inDrinks(u,d){
+  d=d||mainDrink();var n=nOf(u,d);if(n==null)return '';
+  var noun=dNoun(d),t=n===0&&u>0?'less than half a '+noun:n===0?'none':amount(n,noun);
+  return t+(n===0&&u<=0?'':' of '+dWhat(d));
+}
 function equiv(u){
   var b=Math.floor(u/3*2)/2,sh=Math.floor(u/1.4);
   return 'About '+fmt(b)+' large '+(b===1?'bottle':'bottles')+' of beer, or '+plural(sh,'shot')+' of spirits.';
@@ -664,7 +677,6 @@ document.getElementById('nav').addEventListener('click',function(e){var b=e.targ
 
 function render(){
   var app=document.getElementById('app'),nav=document.getElementById('nav');
-  var tool=document.getElementById('tp-units');if(tool&&tool.parentNode!==document.body){tool.hidden=true;document.body.appendChild(tool);}
   var hero=document.getElementById('tp-hero');if(hero)hero.hidden=!!state.settings&&!needTerms()&&!viewTerms&&!state.editing;
   /* pako.health only: the email sign-up waits for the plan, and never sits under a warning. */
   var signup=document.getElementById('tp-signup');
@@ -729,6 +741,10 @@ function edHTML(){
         '<input type="text" maxlength="40" data-f="name" placeholder="'+esc(c.ph)+'" value="'+esc(d.name)+'"></label>'+
         '<label class="field"><span>Alcohol %</span><input type="number" inputmode="decimal" min="0.1" max="96" step="0.1" data-f="pct" value="'+esc(d.pct)+'">'+
         '</label>';
+      if(edCounts)h+='<div class="field"><span id="pw'+i+'">How many '+esc(pl(dNoun(d)))+' in a normal week?</span><div class="stepper">'+
+        '<button type="button" class="ghost" data-act="dec" aria-label="One less">\u2212</button>'+
+        '<input type="number" inputmode="numeric" min="0" max="300" step="1" data-f="perWeek" aria-labelledby="pw'+i+'" value="'+esc(d.perWeek||0)+'">'+
+        '<button type="button" class="ghost" data-act="inc" aria-label="One more">+</button></div></div>';
     }
     h+='</div>';
   });
@@ -748,6 +764,8 @@ function edValid(){
 var edTouched=false;
 /* In set-up the add button sits in the step nav, beside Next. */
 var edAddInNav=false;
+/* pako.health set-up asks how many of each drink in a normal week; the plan starts from that. */
+var edCounts=false;
 function edAddLabel(){return ic('add')+(ed.length?'Add another drink':'Add a drink');}
 function bindEd(box,onChange){
   function draw(){box.innerHTML=edHTML();if(onChange)onChange();}
@@ -757,6 +775,8 @@ function bindEd(box,onChange){
     edTouched=true;
     if(act==='add'){ed.push({cat:'',size:0,ml:null,pct:'',name:''});draw();return;}
     if(act==='del'){ed.splice(i,1);draw();return;}
+    if(act==='inc'||act==='dec'){var dd=ed[i];dd.perWeek=Math.max(0,(+dd.perWeek||0)+(act==='inc'?1:-1));
+      card.querySelector('[data-f=perWeek]').value=dd.perWeek;if(onChange)onChange();return;}
     if(pills&&pills.dataset.k==='cat'){var nm=ed[i].name;ed[i]=newDrink(b.dataset.v);ed[i].name=nm;draw();return;}
     if(pills&&pills.dataset.k==='size'){var d=ed[i],j=+b.dataset.v;d.size=j;
       d.ml=j>=0?CATS[d.cat].sizes[j].ml:null;draw();}
@@ -776,7 +796,7 @@ function drinksScreenHTML(){
     '<div class="row" style="margin-top:6px"><button id="edSave">Save my drinks</button><button class="ghost" id="edCancel">Cancel</button></div>';
 }
 function bindDrinksScreen(){
-  edAddInNav=false;bindEd($('#ed'));
+  edAddInNav=false;edCounts=false;bindEd($('#ed'));
   $('#edSave').onclick=function(){var err=edValid(),el=$('#edErr');
     if(err){el.textContent=err;el.classList.remove('hidden');return;}
     state.myDrinks=clone(ed);save();editingDrinks=false;render();window.scrollTo(0,0);toast('Your drinks are saved');};
@@ -788,7 +808,6 @@ function setupHTML(){
   var pre=!state.settings&&prefill();
   var s=state.settings||(PUBLIC?{start:pre?pre.weekly:'',target:PUBLIC_TARGET,weeks:pre?weeksFor(pre.weekly,PUBLIC_TARGET):'',startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''}:
     {start:45,target:15,weeks:4,startDate:today(),patientName:'',doctorName:'',doctorWa:'',emergency:'',history:''});
-  var calc=PUBLIC&&!pre&&!state.settings&&!!document.getElementById('tp-units');
 
   /* One thing on screen at a time, the same as the other Habit Lab apps.
      Setup used to be the whole worksheet at once: the numbers, the drinks,
@@ -813,10 +832,6 @@ function setupHTML(){
   step('What\'s your name?','',
     '<label class="field" style="margin:0"><input type="text" id="sName" autocomplete="name" aria-label="Your name" maxlength="60" value="'+esc(s.patientName)+'"></label>');
 
-  if(calc)step('What you drink in a normal week',
-    'Add up a normal week. You can change it later.',
-    '<div id="unitsSlot"></div>');
-
   step('Your usual drinks','Check the strength on the label.','<div id="ed"></div>');
 
   step('Before you start','These decide whether it\'s safe to cut down on your own.',
@@ -839,8 +854,11 @@ function setupHTML(){
     '<small class="muted" id="waOut"></small></label>');
 
   step('Your plan','',
-    '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
-    '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
+    /* On pako.health the amounts come from the drinks screen and the plan ends at the
+       low-risk week, so nobody types units. A doctor's copy keeps the fields. */
+    (PUBLIC?'<input type="hidden" id="sStart" value="'+esc(s.start)+'"><input type="hidden" id="sTarget" value="'+esc(PUBLIC_TARGET)+'">'
+    :'<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
+    '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>')+
     '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
     '<label class="field"><span>Start date</span><input type="date" id="sDate" value="'+esc(s.startDate)+'"></label>'+
     '<div id="preview"></div>');
@@ -866,13 +884,17 @@ function bindSetup(){
   var pre=!state.settings&&prefill(),weeksTouched=!!state.settings;
   ed=state.myDrinks.length?clone(state.myDrinks):(pre&&pre.drinks.length?clone(pre.drinks):[{cat:'',size:0,ml:null,pct:'',name:''}]);
   edTouched=false;
-  edAddInNav=true;
-  var redraw=bindEd($('#ed'),function(){if($('#preview'))preview();if(steps)tpSync();});
+  edAddInNav=true;edCounts=PUBLIC;
+  function weekFromEd(){return ed.reduce(function(a,d){var u=dUnits(d);return a+(u>0?(+d.perWeek||0)*u:0);},0);}
+  var redraw=bindEd($('#ed'),function(){
+    var w=Math.round(weekFromEd());
+    if(PUBLIC&&w>0&&$('#sStart')){$('#sStart').value=w;if(!weeksTouched)$('#sWeeks').value=weeksFor(w,PUBLIC_TARGET);}
+    if($('#preview'))preview();if(steps)tpSync();});
   function vals(){return {start:+$('#sStart').value,target:+$('#sTarget').value,weeks:Math.round(+$('#sWeeks').value),startDate:$('#sDate').value||today(),
     patientName:$('#sName').value.trim(),doctorName:$('#sDoc').value.trim(),doctorWa:normWa($('#sWa').value).d||'',emergency:$('#sEm').value.trim(),history:hist,historyOk:ok,morning:morn};}
   function valid(v){
-    if(!(v.start>0))return 'Enter the units a week now.';
-    if(!(v.target>=0)||v.target>=v.start)return 'The end amount must be lower than the amount now.';
+    if(!(v.start>0))return PUBLIC?'Add how many drinks you have in a normal week.':'Enter the units a week now.';
+    if(!(v.target>=0)||v.target>=v.start)return PUBLIC?'You already drink within the low-risk amount, so the plan has nothing to lower.':'The end amount must be lower than the amount now.';
     if(!(v.weeks>=1&&v.weeks<=12))return 'Choose between 1 and 12 weeks.';
     if(!v.emergency)return 'Enter the emergency number for an ambulance.';
     return '';
@@ -880,8 +902,8 @@ function bindSetup(){
   function preview(){
     var v=vals(),err=valid(v),el=$('#preview');
     if(err&&!v.emergency)err=valid(Object.assign({},v,{emergency:'-'}));
-    if(err){el.innerHTML='<h2>Your plan</h2><p class="muted" style="margin:0">'+esc(!v.start&&$('#unitsSlot')?'Fill in what you drink in a normal week to see your plan.':err)+'</p>';return;}
-    el.innerHTML='<h2>Your plan</h2>'+tableHTML(buildPlan(v),0,ed);
+    if(err){el.innerHTML='<p class="muted" style="margin:0">'+esc(err)+'</p>';return;}
+    el.innerHTML=tableHTML(buildPlan(v),0,ed);
   }
   function waOut(){
     var n=normWa($('#sWa').value),o=$('#waOut');
@@ -983,19 +1005,6 @@ function bindSetup(){
     tab='today';render();window.scrollTo(0,0);
   };
   if($('#sCancel'))$('#sCancel').onclick=function(){state.editing=false;render();};
-  /* First use without AUDIT: the site's units calculator fills in the week and the usual drinks. */
-  var tool=document.getElementById('tp-units'),slot=$('#unitsSlot');
-  if(tool&&slot){
-    slot.appendChild(tool);tool.hidden=false;
-    var fromCalc=function(){
-      var c=calcRead(tool);if(!(c.total>0))return;
-      $('#sStart').value=Math.round(c.total);
-      if(!weeksTouched)$('#sWeeks').value=weeksFor(Math.round(c.total),+$('#sTarget').value);
-      if(!edTouched&&c.drinks.length){ed=clone(c.drinks);redraw();}
-      preview();
-    };
-    tool.oninput=fromCalc;tool.onchange=fromCalc;tool.onclick=function(){setTimeout(fromCalc,0);};
-  }
   /* ---- one screen at a time ------------------------------------------
      Six screens. Three of them hold Next back until they have what the
      plan cannot be built without: the safety question, the emergency
@@ -1016,6 +1025,7 @@ function bindSetup(){
       return hist==='No'||ok
     }
     if(n===stepOf('#sEm'))return !!$('#sEm').value.trim()
+    if(PUBLIC&&n===stepOf('#ed'))return weekFromEd()>0||+$('#sStart').value>0
     return true
   }
   function tpShow(n,moving){
@@ -1055,23 +1065,11 @@ function bindSetup(){
   preview();histMsg();mornMsg();waOut();
   var il=document.querySelector('.ios-line');if(il)il.onclick=function(e){if(e.target.closest('[data-sheet=ios]'))openSheet('ios');};
 }
-/* The calculator's rows, keyed by their units, as drink kinds and sizes. Same map as audit.html. */
-var CALC_DRINKS={
-  '3':{cat:'beer',size:2,ml:600,pct:5},'1.7':{cat:'beer',size:1,ml:330,pct:5},
-  '2.3':{cat:'wine',size:1,ml:175,pct:13},'1.4':{cat:'spirits',size:0,ml:35,pct:40},
-  '8':{cat:'bitters',size:1,ml:200,pct:40},'30':{cat:'spirits',size:3,ml:750,pct:40}
-};
-function calcRead(tool){
-  var total=0,rows=[];
-  Array.prototype.forEach.call(tool.querySelectorAll('.pk-u-step[data-units]'),function(step){
-    var n=parseFloat(step.querySelector('input').value);if(!isFinite(n)||n<=0)return;
-    var u=parseFloat(step.dataset.units);total+=n*u;
-    if(CALC_DRINKS[step.dataset.units])rows.push({n:n,u:n*u,d:CALC_DRINKS[step.dataset.units]});
-  });
-  rows.sort(function(a,b){return b.n-a.n||b.u-a.u;});
-  return {total:total,drinks:rows.slice(0,MAX_MINE).map(function(r){return {cat:r.d.cat,size:r.d.size,ml:r.d.ml,pct:r.d.pct,name:''};})};
-}
 function $(s){return document.querySelector(s);}
+function weekSoFar(had,of){
+  var d=mainDrink(),a=nOf(had,d),b=nOf(of,d);if(b==null)return '';
+  return fmt(a)+' of '+fmt(b)+' '+(b===1?dNoun(d):pl(dNoun(d)))+' of '+dWhat(d)+' so far.';
+}
 
 /* ---------- today ---------- */
 function overMsg(day){
@@ -1144,7 +1142,7 @@ function todayHTML(){
     var p=plan();
     if(i.phase!=='diary')h+='<p class="muted">'+(i.phase==='plan'
       ? 'Week '+i.week+' of '+p.length+' \u00b7 day '+i.day+' of '+(p.length*7)
-      : 'Your '+p.length+' weeks are done. Stay at '+i.weekly+' units a week, and talk to '+esc(doc())+' about what next.')+'</p>';
+      : 'Your '+p.length+' weeks are done. Stay at about '+esc(inDrinks(i.weekly))+' a week, and talk to '+esc(doc())+' about what next.')+'</p>';
   }
   var tot=dayTotal(t),pct=Math.min(100,tot/i.daily*100||0);
   var rem=i.daily-tot, state3=tot>i.daily?'over':(rem<=0?'done':'under');
@@ -1173,18 +1171,18 @@ function todayHTML(){
       state3=wt0>i.weekly?'over':(wLeft<=0?'done':'under');
       rem=Math.max(0,wLeft);
       dayNote=state3==='over'
-        ? 'You\'re past this week\'s '+plural(i.weekly,'unit')+'. Write it down anyway, and pick the plan back up next week.'
+        ? 'You\'re past this week\'s amount. Write it down anyway, and pick the plan back up next week.'
         : wLeft<=0
-          ? 'That\'s this week\'s '+plural(i.weekly,'unit')+' gone. Nothing more until next week.'
-          : 'This week you have '+plural(i.weekly,'unit')+' in total, not one for every day. '+plural(wLeft,'unit')+' still to go.';
+          ? 'That\'s this week\'s amount gone. Nothing more until next week.'
+          : 'This amount is for the whole week, not for every day.';
     }
     else if(state3==='over')dayNote='Write it down anyway. Tomorrow, go back to your amount. Don\'t drink less to make up for today.';
-    else if(state3==='done')dayNote='That\'s your '+plural(i.daily,'unit')+' for today.';
-    else if(tot>0)dayNote='That\'s '+plural(rem,'unit')+' of today\'s '+fmt(i.daily)+', after the '+fmt(tot)+' you\'ve had.';
-    else dayNote='That\'s '+plural(rem,'unit')+', your whole amount for today.';
+    else if(state3==='done')dayNote='That\'s your amount for today.';
+    else if(tot>0)dayNote='After what you\'ve had today.';
+    else dayNote='That\'s your whole amount for today.';
     weekNote=wt0>i.weekly
-      ? plural(wt0-i.weekly,'unit')+' over. Stick to your daily amount for the rest of the week. Don\'t stop to make up for it.'
-      : fmt(wt0)+' of '+plural(i.weekly,'unit')+' so far, '+fmt(i.weekly-wt0)+' to go.';
+      ? 'Over the plan. Stick to your daily amount for the rest of the week. Don\'t stop to make up for it.'
+      : weekSoFar(wt0,i.weekly);
 
     var cat=(state.myDrinks[0]&&state.myDrinks[0].cat)||'beer';
     /* On a by-the-week stretch the bottle holds the week, not the day,
@@ -1193,7 +1191,7 @@ function todayHTML(){
     var rp2=state.myDrinks.length?phrases(rem):[];
     var hero=state3==='over'?'You\'ve gone over.'
       :rem<=0?'Nothing left.'
-      :(rp2.length?cap(orList(rp2)):plural(rem,'unit'))+' left.';
+      :(rp2.length?cap(orList(rp2)):'Some')+' left.';
     /* On a by-the-week stretch the main card already is the week, so the
        week row would only say it again. */
     h+='<div class="tp-today is-'+state3+'">'+
@@ -1228,7 +1226,7 @@ function todayHTML(){
     state.myDrinks.forEach(function(d,ix){
       var n=dNoun(d);
       h+='<div class="mine"><div class="head">'+ic(CATS[d.cat].icon)+'<div><b>'+esc(cap(dWhat(d)))+'</b>'+
-        '<div class="muted">'+esc(cap(n))+', '+fmt(d.ml)+'ml, '+fmt(d.pct)+'%. '+fmt(dUnits(d))+' units.</div></div></div>'+
+        '<div class="muted">'+esc(cap(n))+', '+fmt(d.ml)+'ml, '+fmt(d.pct)+'%</div></div></div>'+
         '<div class="acts"><button data-mine="'+ix+'" data-f="1">'+ic('add')+'1 '+esc(n)+'</button>'+
         '<button class="ghost" data-mine="'+ix+'" data-f="0.5">Half</button></div></div>';
     });
@@ -1240,11 +1238,11 @@ function todayHTML(){
      '<div id="onePick">'+oneHTML()+'</div></details></div>';
 
   var list=state.drinks[day]||[];
-  h+='<div class="card"><div class="row spread"><h2 style="margin:0">'+(logDay==='today'?'Today':'Yesterday')+': '+fmt(dayTotal(day))+' units</h2>'+
+  h+='<div class="card"><div class="row spread"><h2 style="margin:0">'+(logDay==='today'?'Today':'Yesterday')+'</h2>'+
      (list.length?'<button class="small ghost" id="undo">'+ic('undo')+'Undo last</button>':'')+'</div>';
   if(!list.length)h+='<p class="muted" style="margin-top:8px">Nothing added yet.</p>';
   else{h+='<ul class="log">';list.forEach(function(x,ix){var tm=new Date(x.t);
-    h+='<li><span>'+esc(x.name)+' <span class="muted">'+String(tm.getHours()).padStart(2,'0')+':'+String(tm.getMinutes()).padStart(2,'0')+'</span></span><span class="row" style="flex-wrap:nowrap"><b>'+fmt(x.u)+'</b><button class="small ghost" data-del="'+ix+'" aria-label="Remove '+esc(x.name)+'">'+ic('delete')+'</button></span></li>';});
+    h+='<li><span>'+esc(x.name)+' <span class="muted">'+String(tm.getHours()).padStart(2,'0')+':'+String(tm.getMinutes()).padStart(2,'0')+'</span></span><span class="row" style="flex-wrap:nowrap"><button class="small ghost" data-del="'+ix+'" aria-label="Remove '+esc(x.name)+'">'+ic('delete')+'</button></span></li>';});
     h+='</ul>';}
   h+='</div>';
   return h;
@@ -1262,7 +1260,7 @@ function oneHTML(){
     h+='<p class="lbl">What size?</p><div class="pills" id="oneSize">'+
       c.sizes.map(function(z,j){return '<button type="button" data-v="'+j+'" aria-pressed="'+(one.size===j)+'">'+esc(cap(z.n))+'</button>';}).join('')+'</div>';
     var z=c.sizes[one.size];
-    if(z)h+='<button type="button" class="wide" id="oneAdd" style="margin-top:14px">'+ic('add')+'Add 1 '+esc(z.n)+' · '+fmt(unitsOf(z.ml,c.pct))+' units</button>'+
+    if(z)h+='<button type="button" class="wide" id="oneAdd" style="margin-top:14px">'+ic('add')+'Add 1 '+esc(z.n)+'</button>'+
       '<p class="muted" style="margin:6px 0 0">'+z.ml+'ml at '+c.pct+'%. If the label says something different, choose Something else.</p>';
   }
   if(one.cat==='other'){
@@ -1283,14 +1281,14 @@ function bindOne(){
     var nm=cap(z.n)+' of '+c.short;one={cat:'',size:-1};addDrink(nm,z.ml,c.pct);};
   var cMl=$('#cMl'),cPct=$('#cPct'),cA=$('#cAdd');
   if(cMl){var upd=function(){var ml=+cMl.value,pc=+cPct.value,ok=ml>0&&pc>0&&pc<=96;cA.disabled=!ok;
-      cA.innerHTML=ic('add')+(ok?'Add this drink · '+fmt(unitsOf(ml,pc))+' units':'Add this drink');};
+      cA.innerHTML=ic('add')+'Add this drink';};
     cMl.oninput=upd;cPct.oninput=upd;
     cA.onclick=function(){var ml=+cMl.value,pc=+cPct.value;if(!(ml>0&&pc>0&&pc<=96))return;
       var nm=$('#cName').value.trim()||(ml+'ml at '+pc+'%');one={cat:'',size:-1};addDrink(nm,ml,pc);};}
 }
 function addDrink(name,ml,pct){
   var u=unitsOf(ml,pct);
-  if(u>=10&&!confirm('That is '+fmt(u)+' units. Add it?'))return;
+  if(u>=10&&!confirm('That\'s a lot of alcohol for one drink. Check the size and the %. Add it?'))return;
   var day=logDay==='today'?today():addDays(today(),-1),i=info(day);
   var dB=dayTotal(day),wB=i.phase!=='before'?weekTotal(i.week):0;
   (state.drinks[day]=state.drinks[day]||[]).push({t:Date.now(),name:name,ml:ml,pct:pct,u:r1(u)});
@@ -1300,7 +1298,7 @@ function addDrink(name,ml,pct){
       if(hasWa()){state.overPrompted[day]=true;state.overCard={day:day};}
     }
   }
-  save();render();toast('Added '+fmt(u)+' units');
+  save();render();toast('Added');
   var sk=nextSheet();if(sk)openSheet(sk);
   if(state.overCard&&state.overCard.day===day)window.scrollTo(0,0);
 }
@@ -1311,7 +1309,6 @@ function checkHTML(){
   var t=today(),c=state.checkins[t]||{},i=info(t);
   if(!draft)draft={sleep:c.sleep||'',craving:c.craving||'',signs:(c.signs||[]).slice(),note:c.note||''};
   var h='<div class="card"><h2>Check-in for '+esc(nice(t))+'</h2>'+
-    '<p>Units today: <b>'+fmt(dayTotal(t))+'</b> <span class="muted">(from your record)</span></p>'+
     '<h3>'+ic('bedtime')+' How did you sleep?</h3><div class="pills" data-f="sleep">'+SLEEP.map(function(o){return '<button aria-pressed="'+(draft.sleep===o)+'">'+o+'</button>';}).join('')+'</div>'+
     '<h3>How strong was the urge to drink?</h3><div class="pills" data-f="craving">'+CRAVE.map(function(o){return '<button aria-pressed="'+(draft.craving===o)+'">'+o+'</button>';}).join('')+'</div>'+
     '<h3>Did you have any of these today?</h3><div id="signs">';
@@ -1329,18 +1326,17 @@ function checkHTML(){
 /* One drink in the table keeps it readable; Today shows all of them. */
 function tableHTML(p,cur,drinks){
   var d=(drinks||state.myDrinks).filter(function(x){return dUnits(x)>0;})[0];
-  var h='<table><thead><tr><th>Week</th><th>Units a week</th><th>A day</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Week</th><th>A week</th><th>A day</th></tr></thead><tbody>';
   p.forEach(function(w){
-    var f=d&&fit(w.daily,d);
-    h+='<tr'+(w.n===cur?' class="now"':'')+'><td>'+w.n+'</td><td>'+w.weekly+'</td><td>'+
+    var f=d&&fit(w.daily,d),fw=d&&fit(w.weekly,d);
+    h+='<tr'+(w.n===cur?' class="now"':'')+'><td>'+w.n+'</td><td>'+(fw?esc(cap(amount(fw.c,fw.noun))):'None')+'</td><td>'+
       /* Once the week drops under about 3.5 units the daily share rounds
          down to nothing, so the row read "2 | 0 units" — the week gives
          you two and the day says none. Say what is actually true: the
          units are there, just not every day. */
       (w.daily===0&&w.weekly>0
-        ? esc(plural(w.weekly,'unit'))+' <span class="muted">across the week</span>'
-        : f?esc(cap(amount(f.c,f.noun)))+' <span class="muted">'+esc(plural(w.daily,'unit'))+'</span>'
-           :esc(plural(w.daily,'unit')))+'</td></tr>';
+        ? '<span class="muted">Spread across the week</span>'
+        : f?esc(cap(amount(f.c,f.noun))):'None')+'</td></tr>';
   });
   h+='</tbody></table>';
   var dw=p.filter(function(w){return w.dry>0;})[0];
@@ -1354,13 +1350,16 @@ function tableHTML(p,cur,drinks){
        so the starting amount is one more step up again. */
     var step=p[0].weekly-p[1].weekly;
     var from=p[0].weekly+step;
-    if(step>4.5)h+='<div class="note" style="margin-top:12px"><p><b>That\'s a big drop: about '+plural(step,'unit')+' every week.</b> More weeks make each drop smaller, up to 12. If it\'s still too fast, talk to a doctor about stopping with support.</p></div>';
+    if(step>4.5)h+='<div class="note" style="margin-top:12px"><p><b>That\'s a big drop every week.</b> More weeks make each drop smaller, up to 12. If it\'s still too fast, talk to a doctor about stopping with support.</p></div>';
   }
   return h;
 }
 function planHTML(){
   var s=state.settings,p=plan(),i=info(today()),h='<div class="card"><h2>Your plan</h2>';
-  h+='<p class="muted">From '+s.start+' to '+s.target+' units a week over '+plural(p.length,'week')+', starting '+esc(niceY(s.startDate))+'.</p>';
+  var md=mainDrink(),span=', over '+plural(p.length,'week')+', starting '+esc(niceY(s.startDate))+'.';
+  if(md)h+='<p class="muted">'+(s.target>0
+    ? 'From about '+fmt(nOf(s.start,md))+' to '+fmt(nOf(s.target,md))+' '+esc(nouns(md))+' of '+esc(dWhat(md))+' a week'
+    : 'From about '+esc(inDrinks(s.start,md))+' a week to none')+span+'</p>';
   h+=tableHTML(p,i.phase==='plan'?i.week:0);
   if(i.phase==='plan'){
     h+='<h3>Week '+i.week+'</h3><div class="dots">';
@@ -1372,8 +1371,6 @@ function planHTML(){
     '<p>Keep to the daily amount. Don\'t save it up for one day.</p>'+
     '<p>Don\'t stop suddenly. That can make you unwell.</p>'+
     '<p>If you go over one day, go back to the plan the next day.</p></div>'+
-    '<div class="card"><h2>What is a unit?</h2><p>One unit is 10ml of pure alcohol. A large bottle of beer at 5% is 3 units. A shot of spirits is about 1.4 units. A shot of strong rum at 69% is about 2.4 units.</p>'+
-    '</div>'+
     '<div class="card"><h2>Ask about thiamine</h2><p>Heavy drinking uses up thiamine, also called vitamin B1. Low thiamine can damage memory. Ask '+esc(doc())+' if you should take it.</p></div>'+
     '<div class="row"><button class="ghost" id="editPlan">'+ic('edit')+'Change the plan</button>'+(PUBLIC?'<button class="ghost" id="viewTerms">'+ic('description')+'Terms of use</button>':'')+'</div>';
   return h;
@@ -1387,18 +1384,19 @@ function progressHTML(){
   var rows=[],max=+s.start;
   for(var w=1;w<=n;w++){var pl=w<=p.length?p[w-1].weekly:p[p.length-1].weekly,ac=w<=i.week?weekTotal(w):null;rows.push({w:w,pl:pl,ac:ac,partial:w===i.week});if(ac!=null&&ac>max)max=ac;}
   max=max*1.15;
+  var md=mainDrink();function cnt(u){var n=nOf(u,md);return n==null?fmt(u):fmt(n);}
   var W=340,H=230,L=6,R=6,T=26,B=40,gw=(W-L-R)/n,bw=Math.min(24,gw*0.38),plotH=H-T-B;
   function y(v){return T+plotH*(1-v/max);}
-  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Weekly units against your plan">';
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="What you drank each week against your plan">';
   svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(T+plotH)+'" y2="'+(T+plotH)+'" stroke="var(--t-line)" stroke-width="1"/>';
   var lab=n<=8;
   rows.forEach(function(r,ix){
     var cx=L+ix*gw+gw/2,px=cx-bw-1,ax=cx+1;
     svg+='<rect x="'+px+'" y="'+y(r.pl)+'" width="'+bw+'" height="'+(T+plotH-y(r.pl))+'" rx="3" fill="var(--t-p3)"/>';
-    if(lab)svg+='<text x="'+(px+bw/2)+'" y="'+(y(r.pl)-5)+'" text-anchor="middle" font-size="11" fill="var(--t-muted)">'+r.pl+'</text>';
+    if(lab)svg+='<text x="'+(px+bw/2)+'" y="'+(y(r.pl)-5)+'" text-anchor="middle" font-size="11" fill="var(--t-muted)">'+cnt(r.pl)+'</text>';
     if(r.ac!=null){
       svg+='<rect x="'+ax+'" y="'+y(r.ac)+'" width="'+bw+'" height="'+Math.max(0,T+plotH-y(r.ac))+'" rx="3" fill="var(--t-p1)"/>';
-      svg+='<text x="'+(ax+bw/2)+'" y="'+(y(r.ac)-5)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--t-p1)">'+fmt(r.ac)+'</text>';
+      svg+='<text x="'+(ax+bw/2)+'" y="'+(y(r.ac)-5)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--t-p1)">'+cnt(r.ac)+'</text>';
     }
     svg+='<text x="'+cx+'" y="'+(T+plotH+16)+'" text-anchor="middle" font-size="11" fill="var(--t-ink)">Wk '+r.w+'</text>';
     if(r.partial)svg+='<text x="'+cx+'" y="'+(T+plotH+30)+'" text-anchor="middle" font-size="10" fill="var(--t-muted)">so far</text>';
@@ -1407,8 +1405,8 @@ function progressHTML(){
     svg+='<text x="'+(cx0-bw/2-1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--t-muted)">plan</text>';
     svg+='<text x="'+(cx0+bw/2+1)+'" y="'+(T-12)+'" text-anchor="middle" font-size="10" fill="var(--t-p1)" font-weight="700">you</text>';}
   svg+='</svg>';
-  var h='<div class="card"><h2>Units each week</h2>'+svg+'<p class="muted">In each week, the left bar is your plan and the right bar is what you drank.</p></div><div class="card"><ul class="log">';
-  rows.forEach(function(r){if(r.ac!=null)h+='<li><span>Week '+r.w+(r.partial?' (so far)':'')+'</span><span><b>'+fmt(r.ac)+'</b> <span class="muted">plan '+r.pl+'</span></span></li>';});
+  var h='<div class="card"><h2>Each week</h2>'+svg+'<p class="muted">In each week, the left bar is your plan and the right bar is what you drank'+(md?', counted in '+esc(nouns(md))+' of '+esc(dWhat(md)):'')+'.</p></div><div class="card"><ul class="log">';
+  rows.forEach(function(r){if(r.ac!=null)h+='<li><span>Week '+r.w+(r.partial?' (so far)':'')+'</span><span><b>'+cnt(r.ac)+'</b> <span class="muted">plan '+cnt(r.pl)+'</span></span></li>';});
   return h+'</ul></div>';
 }
 
