@@ -97,3 +97,10 @@
 #app .note-stop{background:var(--t-red-tint);border-left:0}
 #app .note-stop button{margin-top:var(--s-3)}
 #app .tp-q{font-weight:600;margin:0 0 var(--s-3)}
+/* The email sign-up sits under the tracker, in the app's column. #app keeps
+   room at the bottom for the tab bar; when the sign-up is showing, that room
+   moves below it instead. */
+#tp-signup{max-width:760px;margin:0 auto;padding:0 0 calc(var(--s-11) * 2);box-sizing:border-box}
+#tp-signup .pk-signup{margin-top:0}
+#app:has(+ #tp-signup:not([hidden])){padding-bottom:0}
+@media (max-width:800px){#tp-signup{padding-left:12px;padding-right:12px}}

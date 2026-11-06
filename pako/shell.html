@@ -41,6 +41,11 @@
   <p class="sw-lede">Cut down on alcohol a little each week, with a daily guide in the drinks you have.</p>
   <p class="sw-disclaimer"><b>This is not medical care.</b> It's a self-help tool. Speak to a doctor before you start.</p>
 </div>
+<!-- The email sign-up, filled in by build/chrome.mjs. It sits above the app
+     because the app renders as soon as its script runs, before anything after
+     it exists; render() moves it under #app, shows it under the tracker and
+     hides it on every other screen. -->
+<div id="tp-signup" hidden><!--pako:signup--><!--/pako:signup--></div>
 {{APP}}
 </div>
 <!-- The site's units calculator. Filled in by build/chrome.mjs; the app moves it into setup on first use. -->

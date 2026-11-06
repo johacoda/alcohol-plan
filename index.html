@@ -621,6 +621,9 @@ function render(){
   var app=document.getElementById('app'),nav=document.getElementById('nav');
   var tool=document.getElementById('tp-units');if(tool&&tool.parentNode!==document.body){tool.hidden=true;document.body.appendChild(tool);}
   var hero=document.getElementById('tp-hero');if(hero)hero.hidden=!!state.settings&&!needTerms()&&!viewTerms&&!state.editing;
+  /* pako.health only: the email sign-up waits for the plan, and never sits under a warning. */
+  var signup=document.getElementById('tp-signup');
+  if(signup){signup.hidden=true;if(app.nextSibling!==signup)app.parentNode.insertBefore(signup,app.nextSibling);}
   if(needTerms()||viewTerms){nav.classList.add('hidden');app.innerHTML=termsHTML();bindTerms();return;}
   if(!state.settings||state.editing){nav.classList.add('hidden');app.innerHTML=setupHTML();bindSetup();return;}
   var lvl=warnLevel();
@@ -657,6 +660,7 @@ function render(){
   html+=warnPanel(0);
   app.innerHTML=html;
   bindMain();fillInstall();
+  if(signup)signup.hidden=false;
 }
 
 /* ---------- drinks editor (setup and "My drinks") ---------- */
