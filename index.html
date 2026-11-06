@@ -317,7 +317,7 @@ var SIGNS_DOC=[
 var SIGNS_AMB=[
   {id:'fit',text:'I had a fit (seizure)'},
   {id:'confused',text:'I felt confused'},
-  {id:'seeing',text:'I saw or heard things that were not there'},
+  {id:'seeing',text:'I saw or heard things that weren\'t there'},
   {id:'double',text:'I saw double'},
   {id:'unsteady',text:'I was unsteady on my feet'}
 ];
@@ -482,14 +482,14 @@ function signText(id){var x=SIGNS_DOC.concat(SIGNS_AMB).filter(function(z){retur
 function warnPanel(level){
   var s=state.settings||{},amb='',dr='';
   amb='<h3>Call an ambulance now if you have any of these</h3><ul>'+
-    '<li>A fit (seizure)</li><li>You feel confused</li><li>You see or hear things that are not there</li>'+
+    '<li>A fit (seizure)</li><li>You feel confused</li><li>You see or hear things that aren\'t there</li>'+
     '<li>You see double</li><li>You are unsteady on your feet</li></ul>'+
     (s.emergency?'<a class="btn wide" href="tel:'+esc(s.emergency.replace(/[^\d+]/g,''))+'">'+ic('call')+'Call the ambulance: '+esc(s.emergency)+'</a>':'');
   dr='<h3>Contact '+esc(doc())+' today if you have any of these</h3><ul>'+
     '<li>Your hands shake in the morning, and a drink settles them</li>'+
     '<li>You sweat, feel sick or vomit in the morning</li>'+
     '<li>You need a drink early in the day to feel normal</li></ul>'+
-    '<p>Do not cut down any further until you have spoken to '+esc(doc())+'.</p>'+
+    '<p>Don\'t cut down any further until you\'ve spoken to '+esc(doc())+'.</p>'+
     (s.doctorWa?'<a class="btn" href="tel:+'+esc(s.doctorWa)+'">'+ic('call')+'Call '+esc(doc())+'</a>':'');
   var head=level===2?'<h2>'+ic('warning')+'Get help now</h2><p>You ticked a sign that needs help straight away.</p>':
            level===1?'<h2>'+ic('warning')+'Contact '+esc(doc())+' today</h2><p>You ticked a warning sign today.</p>':
@@ -567,7 +567,7 @@ var TERMS_TICKS=[
  'I have read and agree to the Terms of Use and Medical Disclaimer.',
  'I understand this tool is not healthcare. It\'s a self-help resource and doesn\'t replace a doctor or medical care.',
  'I won\'t use it without a doctor\'s advice. I\'ll get medical help straight away if I feel unwell.',
- 'I am 18 or older.'
+ 'I\'m 18 or older.'
 ];
 var viewTerms=false;
 /* A record of the agreement that travels with every summary the person shares. */
@@ -677,8 +677,8 @@ function render(){
         waBtn(warnMsg(),'Send a message to '+doc(),'wide'+(lvl===2?' ghost':''))+waDelay()+'</div>';
     }
     app.innerHTML='<div class="takeover">'+warnPanel(lvl)+wa+
-      '<div class="card soft"><p>Your record is kept. When you have had help, you can go back to the tracker.</p>'+
-      '<button id="cleared">I have had help. Show the tracker.</button></div></div>';
+      '<div class="card soft"><p>Your record is kept. When you\'ve had help, you can go back to the tracker.</p>'+
+      '<button id="cleared">I\'ve had help. Show the tracker.</button></div></div>';
     document.getElementById('cleared').onclick=function(){state.checkins[today()].cleared=true;save();render();};
     return;
   }
@@ -693,7 +693,7 @@ function render(){
   nav.classList.remove('hidden');
   Array.prototype.forEach.call(nav.querySelectorAll('button'),function(b){b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');});
   var html='<header class="row spread"><h1>My alcohol plan</h1><button class="small ghost" id="startAgain">Start again</button></header>';
-  if(!storageOK)html+='<div class="note">This phone is not saving your record. Use the "For doctor" page often to keep a copy.</div>';
+  if(!storageOK)html+='<div class="note">This phone isn\'t saving your record. Use the "For doctor" page often to keep a copy.</div>';
   html+='<div class="tab'+(tab==='today'?' on':'')+'" id="tab-today">'+todayHTML()+'</div>';
   html+='<div class="tab'+(tab==='check'?' on':'')+'" id="tab-check">'+checkHTML()+'</div>';
   html+='<div class="tab'+(tab==='plan'?' on':'')+'" id="tab-plan">'+planHTML()+'</div>';
@@ -720,19 +720,17 @@ function edHTML(){
         c.sizes.map(function(s,j){return '<button type="button" data-v="'+j+'" aria-pressed="'+(d.size===j)+'">'+esc(cap(s.n))+(s.ml?' '+s.ml+'ml':'')+'</button>';}).join('')+
         (d.cat!=='other'?'<button type="button" data-v="-1" aria-pressed="'+(d.size===-1)+'">Other size</button>':'')+'</div>';
       if(d.size===-1||!c.sizes[d.size]||!c.sizes[d.size].ml)
-        h+='<label class="field" style="margin-top:12px"><span>How many millilitres?</span><input type="number" inputmode="decimal" min="1" data-f="ml" value="'+esc(d.ml==null?'':d.ml)+'"><small class="muted">It is written on the label, for example 500ml.</small></label>';
+        h+='<label class="field" style="margin-top:12px"><span>How many millilitres?</span><input type="number" inputmode="decimal" min="1" data-f="ml" value="'+esc(d.ml==null?'':d.ml)+'"><small class="muted">It\'s on the label.</small></label>';
       h+='<label class="field" style="margin-top:12px"><span>'+(d.cat==='other'?'What is it called?':'Name (you can leave this empty)')+'</span>'+
         '<input type="text" maxlength="40" data-f="name" placeholder="'+esc(c.ph)+'" value="'+esc(d.name)+'"></label>'+
         '<label class="field"><span>Alcohol %</span><input type="number" inputmode="decimal" min="0.1" max="96" step="0.1" data-f="pct" value="'+esc(d.pct)+'">'+
-        '<small class="muted">Check the label. Change this if it is different.</small></label>'+
-        '<p class="muted" data-out style="margin:0">'+esc(edUnitsLine(d))+'</p>';
+        '</label>';
     }
     h+='</div>';
   });
   if(ed.length<MAX_MINE)h+='<button type="button" class="ghost" data-act="add">'+ic('add')+(ed.length?'Add another drink':'Add a drink')+'</button>';
   return h;
 }
-function edUnitsLine(d){var u=dUnits(d);return u>0?'One '+dNoun(d)+' is '+fmt(u)+' units.':'The units will show here.';}
 function edValid(){
   if(!ed.length)return 'Add at least one drink you usually have.';
   for(var i=0;i<ed.length;i++){var d=ed[i],n='Drink '+(i+1)+': ';
@@ -760,14 +758,13 @@ function bindEd(box,onChange){
     var f=e.target.dataset.f;if(!f)return;
     var card=e.target.closest('[data-i]'),d=ed[+card.dataset.i];
     d[f]=f==='name'?e.target.value:(e.target.value===''?null:+e.target.value);
-    card.querySelector('[data-out]').textContent=edUnitsLine(d);
     edTouched=true;if(onChange)onChange();
   };
   draw();
   return draw;
 }
 function drinksScreenHTML(){
-  return '<h1>My drinks</h1><p>Add up to '+MAX_MINE+' drinks you usually have. The app uses them to show your daily guide.</p>'+
+  return '<h1>My drinks</h1><p>Add up to '+MAX_MINE+' drinks you usually have.</p>'+
     '<div id="ed"></div><div id="edErr" class="note hidden"></div>'+
     '<div class="row" style="margin-top:6px"><button id="edSave">Save my drinks</button><button class="ghost" id="edCancel">Cancel</button></div>';
 }
@@ -811,7 +808,7 @@ function setupHTML(){
 
   step('Your usual drinks','Check the strength on the label.','<div id="ed"></div>');
 
-  step('Before you start','Two questions. They decide whether cutting down on your own is safe for you.',
+  step('Before you start','These decide whether it\'s safe to cut down on your own.',
     '<p class="tp-q">Have you ever had a fit, or seen or heard things that were not there, when you stopped or cut down drinking?</p>'+
     '<div class="pills" id="sHist">'+['No','Yes','I am not sure'].map(function(o){return '<button type="button" aria-pressed="'+(s.history===o)+'">'+o+'</button>';}).join('')+'</div>'+
     '<div id="histMsg"></div>'+
@@ -831,7 +828,7 @@ function setupHTML(){
     '<label class="field" style="margin:0"><span>Doctor\'s WhatsApp number</span><input type="tel" id="sWa" placeholder="For example: +1 473 555 0123" value="'+esc(s.doctorWa?'+'+s.doctorWa:'')+'">'+
     '<small class="muted" id="waOut"></small></label>');
 
-  step('Your plan','Change these and the plan below changes with them.',
+  step('Your plan','',
     '<label class="field"><span>Units a week now</span><input type="number" id="sStart" min="1" max="300" step="1" value="'+esc(s.start)+'"></label>'+
     '<label class="field"><span>Units a week at the end</span><input type="number" id="sTarget" min="0" max="300" step="1" value="'+esc(s.target)+'"></label>'+
     '<label class="field"><span>Number of weeks</span><input type="number" id="sWeeks" min="1" max="12" step="1" value="'+esc(s.weeks)+'"></label>'+
@@ -905,7 +902,7 @@ function bindSetup(){
         (r==='yes'?'Don\'t cut down on your own.':'Check with a doctor first.')+'</b> '+
         (r==='yes'
           ? 'A fit or seeing things after stopping means your body has come to depend on alcohol. Cutting down without a doctor can bring that on again, and it can kill. You need someone to look after you while you do this.'
-          : 'If you\'re not sure, treat it as a yes until a doctor tells you otherwise. It takes one appointment to find out.')+
+          : 'If you\'re not sure, treat it as a yes until a doctor tells you otherwise.')+
         '</p><p>You can still keep a diary of what you drink, and show it to your doctor.</p>'+
         '<button type="button" id="sDiary">Keep a diary instead</button></div>';
       $('#sDiary').onclick=function(){
@@ -926,7 +923,7 @@ function bindSetup(){
     } else if(!PUBLIC&&(hist==='Yes'||hist==='I am not sure')){
       m.innerHTML='<div class="note" style="margin-top:12px"><p>'+(hist==='Yes'?'Don\'t cut down alone.':'Check before starting.')+
       ' Anyone who has had fits or seen things after stopping needs a health team watching them while they cut down.</p>'+
-      '<label class="chk"><input type="checkbox" id="sOk"'+(ok?' checked':'')+'><span>I have checked this patient and they can start</span></label></div>';
+      '<label class="chk"><input type="checkbox" id="sOk"'+(ok?' checked':'')+'><spanI\'ve checked this patient and they can start</span></label></div>';
       $('#sOk').onchange=function(){ok=this.checked;gate();};
     } else m.innerHTML='';
     gate();
@@ -1162,7 +1159,7 @@ function todayHTML(){
           ? 'That\'s this week\'s '+plural(i.weekly,'unit')+' gone. Nothing more until next week.'
           : 'This week you have '+plural(i.weekly,'unit')+' in total, not one for every day. '+plural(wLeft,'unit')+' still to go.';
     }
-    else if(state3==='over')dayNote='Write it down anyway. Tomorrow, go back to your amount \u2014 don\'t drink less to make up for today.';
+    else if(state3==='over')dayNote='Write it down anyway. Tomorrow, go back to your amount. Don\'t drink less to make up for today.';
     else if(state3==='done')dayNote='That\'s your '+plural(i.daily,'unit')+' for today.';
     else if(tot>0)dayNote='That\'s '+plural(rem,'unit')+' of today\'s '+fmt(i.daily)+', after the '+fmt(tot)+' you\'ve had.';
     else dayNote='That\'s '+plural(rem,'unit')+', your whole amount for today.';
@@ -1220,8 +1217,7 @@ function todayHTML(){
   }
   /* A one-off drink is the last row of the list, not a second control under it.
      It logs the drink without adding it to My drinks. */
-  h+='<details class="mine other"><summary class="head">'+ic('add')+'<div><b>Another drink</b>'+
-     '<div class="muted">A drink that isn\'t on your list.</div></div></summary>'+
+  h+='<details class="mine other"><summary class="head">'+ic('add')+'<div><b>Another drink</b></div></summary>'+
      '<div id="onePick">'+oneHTML()+'</div></details></div>';
 
   var list=state.drinks[day]||[];
@@ -1339,7 +1335,7 @@ function tableHTML(p,cur,drinks){
        so the starting amount is one more step up again. */
     var step=p[0].weekly-p[1].weekly;
     var from=p[0].weekly+step;
-    if(step>4.5)h+='<div class="note" style="margin-top:12px"><p><b>This is a big drop each week.</b> Twelve weeks is as long as this plan goes, so coming down from '+plural(from,'unit')+' a week means losing about '+plural(step,'unit')+' every week. Talk to a doctor about stopping with support rather than doing it this fast on your own.</p></div>';
+    if(step>4.5)h+='<div class="note" style="margin-top:12px"><p><b>That\'s a big drop: about '+plural(step,'unit')+' every week.</b> More weeks make each drop smaller, up to 12. If it\'s still too fast, talk to a doctor about stopping with support.</p></div>';
   }
   return h;
 }
@@ -1357,8 +1353,8 @@ function planHTML(){
     '<p>Keep to the daily amount. Don\'t save it up for one day.</p>'+
     '<p>Don\'t stop suddenly. That can make you unwell.</p>'+
     '<p>If you go over one day, go back to the plan the next day.</p></div>'+
-    '<div class="card"><h2>What is a unit?</h2><p>One unit is 10ml of pure alcohol. To work it out, take the millilitres, times the alcohol %, and divide by 1000. A large bottle of beer at 5% is 3 units. A shot of spirits is about 1.4 units. A shot of strong rum at 69% is about 2.4 units.</p>'+
-    '<p class="muted">Units are a British measure. American "standard drinks" hold almost twice as much alcohol, so do not mix the two.</p></div>'+
+    '<div class="card"><h2>What is a unit?</h2><p>One unit is 10ml of pure alcohol. A large bottle of beer at 5% is 3 units. A shot of spirits is about 1.4 units. A shot of strong rum at 69% is about 2.4 units.</p>'+
+    '</div>'+
     '<div class="card"><h2>Ask about thiamine</h2><p>Heavy drinking uses up thiamine, also called vitamin B1. Low thiamine can damage memory. Ask '+esc(doc())+' if you should take it.</p></div>'+
     '<div class="row"><button class="ghost" id="editPlan">'+ic('edit')+'Change the plan</button>'+(PUBLIC?'<button class="ghost" id="viewTerms">'+ic('description')+'Terms of use</button>':'')+'</div>';
   return h;
@@ -1463,7 +1459,7 @@ function summaryHTML(){
 }
 function copyText(txt){
   function fallback(){var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
-    var ok=false;try{ok=document.execCommand('copy');}catch(e){}document.body.removeChild(ta);toast(ok?'Copied':'Could not copy. Press and hold the text to copy it.');}
+    var ok=false;try{ok=document.execCommand('copy');}catch(e){}document.body.removeChild(ta);toast(ok?'Copied':'Couldn\'t copy. Press and hold the text to copy it.');}
   if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(function(){toast('Copied');},fallback);}else fallback();
 }
 
