@@ -66,6 +66,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .mine .head .ic{color:var(--t-p1);width:1.6em;height:1.6em}
 .mine .acts{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:10px}
 .mine .acts button{padding:10px 8px}
+.mine.other{margin:0}
+.mine.other>summary{list-style:none;cursor:pointer}
+.mine.other>summary::-webkit-details-marker{display:none}
+/* Inside the grey row, the drink tiles take the card colour so they still read as tiles. */
+.mine.other .drink{background:var(--t-card)}
 .seg{display:flex;background:var(--t-surface);border-radius:10px;padding:var(--s-1,4px);gap:var(--s-1,4px)}
 .seg button{flex:1;background:transparent;border:none;color:var(--t-ink);padding:8px;font-weight:600}
 .seg button[aria-pressed="true"]{background:var(--t-card);color:var(--t-p1);box-shadow:0 1px 2px rgba(0,0,0,.15)}
@@ -1150,7 +1155,11 @@ function todayHTML(){
   if(i.phase==='plan'&&i.week<=2)h+='<div class="note">In weeks 1 and 2, don\'t stop suddenly. Spread a smaller amount across every day.</div>';
   if(i.dry>0&&i.phase!=='before'&&i.phase!=='diary')h+='<div class="note">This week you can have up to '+plural(i.dry,'day')+' with no alcohol. Don\'t drink more on the other days.</div>';
 
-  h+='<div class="card"><h2>Add a drink</h2><div class="seg" id="logDay" style="margin-bottom:12px">'+
+  /* Editing the list sits by the heading, like Undo last on the card below: it
+     changes the list, it doesn't log anything. */
+  h+='<div class="card"><div class="row spread" style="margin-bottom:8px"><h2 style="margin:0">Add a drink</h2>'+
+     (state.myDrinks.length?'<button class="small ghost" id="editMine">'+ic('edit')+'Edit my drinks</button>':'')+'</div>'+
+     '<div class="seg" id="logDay" style="margin-bottom:12px">'+
      '<button aria-pressed="'+(logDay==='today')+'" data-d="today">Today</button><button aria-pressed="'+(logDay==='yest')+'" data-d="yest">Yesterday</button></div>';
   if(!state.myDrinks.length){
     h+='<div class="note"><p>Add the drinks you usually have. Then the app can show your guide in bottles, glasses or shots.</p><button class="small" id="editMine">'+ic('add')+'Add my drinks</button></div>';
@@ -1163,13 +1172,17 @@ function todayHTML(){
         '<div class="acts"><button data-mine="'+ix+'" data-f="1">'+ic('add')+'1 '+esc(n)+'</button>'+
         '<button class="ghost" data-mine="'+ix+'" data-f="0.5">Half</button></div></div>';
     });
-    h+='</div><button class="small ghost" id="editMine">'+ic('edit')+'Change my drinks</button>';
+    h+='</div>';
   }
-  h+='<details style="margin-top:14px"><summary><b>Something not on my list</b></summary><div class="grid" id="drinkGrid" style="margin-top:10px">';
+  /* A one-off drink is the last row of the list, not a second control under it.
+     It logs the drink without adding it to My drinks. */
+  h+='<details class="mine other"><summary class="head">'+ic('add')+'<div><b>Another drink</b>'+
+     '<div class="muted">A drink that isn\'t on your list.</div></div></summary>'+
+     '<div class="grid" id="drinkGrid" style="margin-top:12px">';
   DRINKS.concat(state.custom).forEach(function(d,ix){
     h+='<button class="drink" data-ix="'+ix+'">'+ic(d.icon||'local_bar')+' '+esc(d.name)+'<span>'+esc(d.detail||(d.ml+'ml at '+d.pct+'%'))+'</span><b>'+fmt(unitsOf(d.ml,d.pct))+' units</b></button>';
   });
-  h+='</div><h3>Another drink</h3>'+
+  h+='</div><h3>Or type it in</h3>'+
      '<label class="field"><span>Name (you can leave this empty)</span><input type="text" id="cName"></label>'+
      '<div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Millilitres</span><input type="number" id="cMl" min="1" inputmode="decimal"></label>'+
      '<label class="field" style="flex:1"><span>Alcohol %</span><input type="number" id="cPct" min="0.1" max="96" step="0.1" inputmode="decimal"></label></div>'+
