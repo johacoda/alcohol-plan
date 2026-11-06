@@ -631,15 +631,12 @@ function iosLineHTML(){
 }
 function sheetHTML(kind){
   var x='<button class="x" data-sheet="close" aria-label="Close">'+ic('close')+'</button>';
-  if(kind==='ios')return '<h2>Add it to your home screen</h2><p>Tap Share, then Add to Home Screen. Open the plan from there, or your record stays in Safari.</p>'+
-    '<div class="row"><button class="small" data-sheet="close">OK</button></div>'+x;
-  var inst=installEvt&&canInstall(),h='';
-  if(kind==='first')h+='<h2>Saved on this phone only</h2><p>Clearing your browser data deletes it. Send a copy from For doctor before each visit.</p>';
-  else h+='<h2>Keep it on your phone</h2>';
-  if(inst)h+='<p>Add it to your home screen to open it in one tap, even offline.</p>';
-  h+='<div class="row">'+(inst?'<button class="small" data-sheet="go">'+ic('add')+'Add to home screen</button><button class="small ghost" data-sheet="close">Not now</button>'
-    :'<button class="small" data-sheet="close">OK</button>')+'</div>'+x;
-  return h;
+  if(kind==='ios')return '<h2>Add it to your home screen</h2><p>Tap Share, then Add to Home Screen. Open the plan from there.</p>'+x;
+  /* One ask per sheet. The record first, because losing it is the real risk. */
+  if(kind==='first')return '<h2>Your record is only on this phone</h2><p>If you clear your browser data, it\'s gone.</p>'+
+    '<div class="row"><button class="small" data-sheet="copy">Keep a copy</button><button class="small ghost" data-sheet="close">Not now</button></div>';
+  return '<h2>Add it to your home screen?</h2>'+
+    '<div class="row"><button class="small" data-sheet="go">'+ic('add')+'Add to home screen</button><button class="small ghost" data-sheet="close">Not now</button></div>';
 }
 function nextSheet(){
   if(!state.storageNoted)return 'first';
@@ -651,7 +648,7 @@ function openSheet(kind){
   if(!el){el=document.createElement('div');el.id='sheet';el.className='sheet';el.setAttribute('role','dialog');el.setAttribute('aria-modal','false');document.body.appendChild(el);
     el.onclick=function(e){var b=e.target.closest('[data-sheet]');if(!b)return;
       if(b.dataset.sheet==='go'&&installEvt){installEvt.prompt();installEvt.userChoice.then(function(){installEvt=null;});}
-      closeSheet();};
+      closeSheet();if(b.dataset.sheet==='copy')go('summary');};
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});}
   var nav=document.getElementById('nav');
   el.style.bottom=(nav&&!nav.classList.contains('hidden')?nav.offsetHeight:0)+12+'px';
@@ -663,7 +660,7 @@ function closeSheet(){
   var el=document.getElementById('sheet');if(!el||!el.classList.contains('on'))return;
   var k=el.dataset.kind;
   if(k==='first')state.storageNoted=true;
-  if(k==='install'||k==='ios'||(k==='first'&&installEvt))state.installDismissed=true;
+  if(k==='install'||k==='ios')state.installDismissed=true;
   save();el.classList.remove('on');
 }
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();installEvt=e;});
