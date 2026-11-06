@@ -149,7 +149,6 @@ ul.keys li{margin:0 0 8px}
 .tp-prog{margin:0 0 var(--s-7,28px)}
 .tp-prog-bar{height:6px;border-radius:9999px;background:var(--t-ptint);overflow:hidden}
 .tp-prog-bar span{display:block;height:100%;width:0;border-radius:9999px;background:var(--t-p1);transition:width 350ms ease}
-.tp-prog-count{margin:var(--s-snug,10px) 0 0}
 .tp-nav{display:flex;align-items:center;gap:var(--s-4,16px);margin-top:var(--s-7,28px);flex-wrap:wrap}
 .tp-nav [hidden]{display:none !important}
 /* Add a drink shares the row with Next; with Back there too it takes its own row. */
@@ -525,7 +524,7 @@ function warnMsg(){
 
 /* ---------- terms of use (public version only) ---------- */
 /* Change TERMS_V whenever the text changes: everyone is asked to agree again. */
-var TERMS_V='2026-10-11';
+var TERMS_V='2026-11-06';
 var TERMS_DATE='11 October 2026';
 var TERMS=[
  ['1. About these terms',[
@@ -547,7 +546,7 @@ var TERMS=[
   'The Tool cannot detect withdrawal and cannot tell you whether you are safe. Its warning screens are general reminders based only on what you tick. They are not monitoring, and they will not appear if you do not record your symptoms.']],
  ['5. The plan and the numbers are estimates',[
   'The Tool builds a plan from a general formula and from the numbers you enter. The plan is not made for you by a health worker and does not take account of your health, history, weight, medicines or other circumstances.',
-  'Units, drink sizes and alcohol strengths in the Tool are estimates. Real drinks vary, labels can be wrong, and you may enter numbers incorrectly. You are responsible for checking every number the Tool uses and shows.',
+  'Drink sizes, alcohol strengths and amounts in the Tool are estimates. Real drinks vary, labels can be wrong, and you may enter numbers incorrectly. You are responsible for checking every number the Tool uses and shows.',
   'Any default plan, target or drink strength in the Tool is a starting point only, and is not a recommendation that it is safe or suitable for you.']],
  ['6. Messages and calls',[
   'If you add a doctor\'s number, the Tool can open WhatsApp or your phone with a message or call ready for you. You decide whether to send or make it. Pákó does not send, receive, read or store these messages, and is not responsible for WhatsApp, your phone, your network or the person you contact.',
@@ -864,8 +863,8 @@ function setupHTML(){
     '<div id="preview"></div>');
 
   var h='<h1>Set up your plan</h1>'+iosLineHTML()+
-  '<div class="tp-prog" id="tpProg"><div class="tp-prog-bar"><span id="tpProgFill"></span></div>'+
-  '<p class="tp-prog-count muted" id="tpProgCount">&nbsp;</p></div>'+
+  /* The bar shows how far along you are; a "Step 2 of 6" line under it only said it again. */
+  '<div class="tp-prog" id="tpProg"><div class="tp-prog-bar" id="tpProgBar" role="progressbar"><span id="tpProgFill"></span></div></div>'+
   (pre?'<div class="note"><p style="margin:0">Filled in from Check your drinking. Check it before you start.</p></div>':'')+
   steps()+
   '<div id="setupErr" class="note hidden"></div>'+
@@ -1032,7 +1031,7 @@ function bindSetup(){
     at=Math.max(1,Math.min(steps.length,n))
     steps.forEach(function(el){el.hidden=+el.dataset.step!==at})
     $('#tpProgFill').style.width=(at/steps.length*100)+'%'
-    $('#tpProgCount').textContent='Step '+at+' of '+steps.length
+    $('#tpProgBar').setAttribute('aria-valuetext','Step '+at+' of '+steps.length)
     tpSync()
     if(moving){
       $('#tpProg').scrollIntoView({block:'start'})

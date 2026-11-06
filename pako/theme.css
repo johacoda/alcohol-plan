@@ -89,7 +89,6 @@
 #app .tp-prog{margin:0 0 var(--s-7)}
 #app .tp-prog-bar{height:6px;border-radius:9999px;background:var(--t-ptint);overflow:hidden}
 #app .tp-prog-bar span{background:var(--t-p1)}
-#app .tp-prog-count{margin:var(--s-snug) 0 0 !important}
 #app .tp-nav{display:flex;align-items:center;gap:var(--s-4);margin-top:var(--s-7);flex-wrap:wrap}
 #app .tp-nav [hidden]{display:none !important}
 #app .tp-nav button{min-height:48px}
