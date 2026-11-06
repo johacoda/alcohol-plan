@@ -43,6 +43,8 @@
 #app .seg{border-radius:12px;background:var(--t-surface)}
 #app .seg button{border-radius:9px}
 #app input[type=number],#app input[type=text],#app input[type=tel],#app input[type=date],#app textarea{border:1px solid var(--t-line);border-radius:8px !important;min-height:48px;background:#FFFFFF}
+/* The site's focus ring is a thick red outline. In a form this long it reads as an error, so a field in focus just turns its border purple. */
+#app :is(input,textarea,select):focus-visible{outline:none !important;border-color:var(--t-p1) !important;box-shadow:0 0 0 1px var(--t-p1) !important}
 #app a{color:var(--t-p1)}
 
 /* The warning panel: the site's tint-red card. Its heading must beat miro's ink-on-headings rule. */
